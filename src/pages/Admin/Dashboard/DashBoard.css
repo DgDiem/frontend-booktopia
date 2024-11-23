@@ -1,0 +1,49 @@
+.ps-sidebar-container.css-dip3t8 {
+  background-color: white;
+}
+.ps-menu-icon.css-wx7wi4 {
+  width: unset;
+  min-width: unset;
+}
+span > .css-honxw6 {
+  width: 7px;
+  height: 7px;
+}
+span > .css-jn69v9 {
+  width: 7px;
+  height: 7px;
+}
+.sidebar {
+  transition: width 0.3s;
+  position: relative;
+}
+
+.sidebar.collapsed {
+  width: 0px;
+}
+
+.sidebar.expanded {
+  width: 270px;
+}
+
+.toggle-button {
+  position: absolute;
+  top: 10px;
+  left: 0px; /* Đưa nút ra ngoài sidebar để dễ nhấn */
+  width: 40px;
+  height: 40px;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 1000; /* Đảm bảo nút nằm trên các phần tử khác */
+}
+
+.toggle-button svg {
+  width: 24px;
+  height: 24px;
+}
