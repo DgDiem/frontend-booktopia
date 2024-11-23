@@ -9,7 +9,7 @@ import {
   FaTrashAlt,
   FaUser,
   FaUserEdit,
-  FaGift
+  FaGift,
 } from "react-icons/fa";
 import { MdLogout } from "react-icons/md";
 import { AiFillDashboard, AiOutlineBars } from "react-icons/ai";
@@ -36,7 +36,7 @@ const ManageProduct = () => {
   useEffect(() => {
     const fetchProductList = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/products");
+        const response = await axios.get(`${URL_API}/products`);
         const data = response.data;
         setAllProductList(data);
         console.log(data);
@@ -62,8 +62,11 @@ const ManageProduct = () => {
       <div className="flex min-h-screen border">
         {/* Sidebar */}
         <Sidebar
-          className={`relative border p-3 bg-white ${collapsed ? "collapsed" : "expanded"}`}
-          width={collapsed ? "0px" : "270px"}>
+          className={`relative border p-3 bg-white ${
+            collapsed ? "collapsed" : "expanded"
+          }`}
+          width={collapsed ? "0px" : "270px"}
+        >
           <Menu className="bg-white">
             <div className="flex items-center justify-center mb-6">
               <img src="./images/logo.png" alt="Logo" />
@@ -75,17 +78,27 @@ const ManageProduct = () => {
               </div>
             </MenuItem>
 
-            <SubMenu label="Quản lý danh mục" icon={<AiOutlineBars className="w-5 h-5" />}>
+            <SubMenu
+              label="Quản lý danh mục"
+              icon={<AiOutlineBars className="w-5 h-5" />}
+            >
               <MenuItem component={<Link to="/admin/manage-category" />}>
                 Danh sách danh mục
               </MenuItem>
             </SubMenu>
-            <SubMenu label="Quản lý sản phẩm" icon={<FaBook className="w-5 h-5" />}>
+            <SubMenu
+              label="Quản lý sản phẩm"
+              icon={<FaBook className="w-5 h-5" />}
+            >
               <MenuItem component={<Link to="/admin/manage-product" />}>
                 Danh sách sản phẩm
               </MenuItem>
-              <MenuItem component={<Link to="/admin/manage-author" />}>Tác giả</MenuItem>
-              <MenuItem component={<Link to="/admin/manage-publishes" />}>Nhà xuất bản</MenuItem>
+              <MenuItem component={<Link to="/admin/manage-author" />}>
+                Tác giả
+              </MenuItem>
+              <MenuItem component={<Link to="/admin/manage-publishes" />}>
+                Nhà xuất bản
+              </MenuItem>
             </SubMenu>
             <MenuItem component={<Link to="/admin/manage-order" />}>
               <div className="flex items-center gap-4">
@@ -105,8 +118,13 @@ const ManageProduct = () => {
                 Quản lý voucher
               </div>
             </MenuItem>
-            <SubMenu label="Quản lý bài viết" icon={<FaRegEdit className="w-5 h-5" />}>
-              <MenuItem component={<Link to="/admin/manage-blog" />}>Danh sách bài viết</MenuItem>
+            <SubMenu
+              label="Quản lý bài viết"
+              icon={<FaRegEdit className="w-5 h-5" />}
+            >
+              <MenuItem component={<Link to="/admin/manage-blog" />}>
+                Danh sách bài viết
+              </MenuItem>
             </SubMenu>
             <MenuItem component={<Link to="/admin/manage-contact" />}>
               <div className="flex items-center gap-4">
@@ -116,7 +134,7 @@ const ManageProduct = () => {
             </MenuItem>
             <MenuItem component={<Link to="/admin/stock" />}>
               <div className="flex items-center gap-4">
-              <MdInventory />
+                <MdInventory />
                 Quản lý tồn kho
               </div>
             </MenuItem>
@@ -129,13 +147,17 @@ const ManageProduct = () => {
           </Menu>
         </Sidebar>
         {/* Nút toggle nằm bên ngoài Sidebar */}
-        <button onClick={() => setCollapsed(!collapsed)} className="toggle-button">
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="toggle-button"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
-            stroke="currentColor">
+            stroke="currentColor"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"

@@ -28,7 +28,8 @@ const Menu = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [totalProducts, setTotalProducts] = useState(0);
   const pagesPerGroup = 3;
-  const [currentCategoryName, setCurrentCategoryName] = useState("Tất cả sản phẩm");
+  const [currentCategoryName, setCurrentCategoryName] =
+    useState("Tất cả sản phẩm");
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
@@ -186,7 +187,7 @@ const Menu = () => {
   useEffect(() => {
     const fetchTotalProducts = async () => {
       try {
-        const url = "http://localhost:3000/products/products/total";
+        const url = `${URL_API}/products/products/total`;
         const response = await axios.get(url);
 
         if (response.status === 200) {
@@ -217,15 +218,21 @@ const Menu = () => {
 
   const renderPageButtons = () => {
     const startPage = pageGroup * pagesPerGroup + 1;
-    const pages = Array.from({ length: pagesPerGroup }, (_, i) => startPage + i);
+    const pages = Array.from(
+      { length: pagesPerGroup },
+      (_, i) => startPage + i
+    );
 
     return pages.map((page) => (
       <span
         key={page}
         className={`w-10 h-10 rounded-full flex items-center justify-center ${
-          currentPage === page ? "bg-mainDark text-white" : "border text-grayText"
+          currentPage === page
+            ? "bg-mainDark text-white"
+            : "border text-grayText"
         } text-[20px] font-semibold cursor-pointer`}
-        onClick={() => handlePageClick(page)}>
+        onClick={() => handlePageClick(page)}
+      >
         {page}
       </span>
     ));
@@ -253,7 +260,11 @@ const Menu = () => {
                     items={categories}
                     onCategoryClick={categoryClick}
                   />
-                  <CategoryItem title="Tác giả" items={authors} onAuthorClick={authorClick} />
+                  <CategoryItem
+                    title="Tác giả"
+                    items={authors}
+                    onAuthorClick={authorClick}
+                  />
                   <CategoryItem
                     title="Nhà xuất bản"
                     items={publishers}
@@ -270,7 +281,8 @@ const Menu = () => {
                   <select
                     className="select select-bordered w-full max-w-xs custom-select"
                     value={sortOption}
-                    onChange={(e) => setSortOption(e.target.value)}>
+                    onChange={(e) => setSortOption(e.target.value)}
+                  >
                     <option disabled value="">
                       Sắp xếp theo:
                     </option>
@@ -297,7 +309,8 @@ const Menu = () => {
               <div className="flex items-center justify-center gap-5 mt-6">
                 <span
                   className="w-10 h-10 rounded-full flex items-center justify-center border text-grayText text-[20px] font-semibold hover:bg-mainDark hover:text-white cursor-pointer"
-                  onClick={handlePrevGroup}>
+                  onClick={handlePrevGroup}
+                >
                   <FaLongArrowAltLeft />
                 </span>
 

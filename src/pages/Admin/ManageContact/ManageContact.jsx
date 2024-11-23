@@ -8,7 +8,7 @@ import {
   FaTrashAlt,
   FaUser,
   FaUserClock,
-  FaGift
+  FaGift,
 } from "react-icons/fa";
 import { MdLogout } from "react-icons/md";
 import { AiFillDashboard, AiOutlineBars } from "react-icons/ai";
@@ -19,6 +19,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { showSwalFireDelete } from "../../../helpers/helpers";
 import { MdMarkEmailRead } from "react-icons/md";
 import { MdInventory } from "react-icons/md";
+import { URL_API } from "../../../constants/constants";
 
 const ManageContact = () => {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ const ManageContact = () => {
   useEffect(() => {
     const fetchContacts = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/contact/api/contacts");
+        const response = await axios.get(`${URL_API}/contact/api/contacts`);
         setContacts(response.data);
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu liên hệ:", error);
@@ -43,37 +44,40 @@ const ManageContact = () => {
 
   const handleUpdateStatus = async (id) => {
     try {
-      const response = await axios.patch(`http://localhost:3000/contact/api/contact/${id}/status`);
+      const response = await axios.patch(
+        `${URL_API}/contact/api/contact/${id}/status`
+      );
       const updatedContact = response.data.contact;
       setContacts((prevContacts) =>
         prevContacts.map((contact) =>
           contact._id === updatedContact._id ? updatedContact : contact
         )
       );
-      toast.success('Thay đổi trạng thái thành công!');
-
-
+      toast.success("Thay đổi trạng thái thành công!");
     } catch (error) {
       console.error("Lỗi khi cập nhật trạng thái:", error);
     }
   };
   const handleDeleteContact = async (id) => {
     try {
-      await axios.delete(`http://localhost:3000/contact/api/contact/${id}`);
-      setContacts((prevContacts) => prevContacts.filter((contact) => contact._id !== id));
-      toast.success('Xóa thành công!');
+      await axios.delete(`${URL_API}/contact/api/contact/${id}`);
+      setContacts((prevContacts) =>
+        prevContacts.filter((contact) => contact._id !== id)
+      );
+      toast.success("Xóa thành công!");
     } catch (error) {
-      toast.error('Liên hệ chưa phản hồi không được xóa!');
+      toast.error("Liên hệ chưa phản hồi không được xóa!");
     }
-  }
+  };
   return (
-
     <div>
       <ToastContainer autoClose={3000} />
 
       <div className="flex min-h-screen border">
         <Sidebar
-          className={`relative border p-3 bg-white ${collapsed ? "collapsed" : "expanded"}`}
+          className={`relative border p-3 bg-white ${
+            collapsed ? "collapsed" : "expanded"
+          }`}
           width={collapsed ? "0px" : "270px"}
         >
           <Menu className="bg-white">
@@ -86,17 +90,27 @@ const ManageContact = () => {
                 Dashboard
               </div>
             </MenuItem>
-            <SubMenu label="Quản lý danh mục" icon={<AiOutlineBars className="w-5 h-5" />}>
+            <SubMenu
+              label="Quản lý danh mục"
+              icon={<AiOutlineBars className="w-5 h-5" />}
+            >
               <MenuItem component={<Link to="/admin/manage-category" />}>
                 Danh sách danh mục
               </MenuItem>
             </SubMenu>
-            <SubMenu label="Quản lý sản phẩm" icon={<FaBook className="w-5 h-5" />}>
+            <SubMenu
+              label="Quản lý sản phẩm"
+              icon={<FaBook className="w-5 h-5" />}
+            >
               <MenuItem component={<Link to="/admin/manage-product" />}>
                 Danh sách sản phẩm
               </MenuItem>
-              <MenuItem component={<Link to="/admin/manage-author" />}>Tác giả</MenuItem>
-              <MenuItem component={<Link to="/admin/manage-publishes" />}>Nhà xuất bản</MenuItem>
+              <MenuItem component={<Link to="/admin/manage-author" />}>
+                Tác giả
+              </MenuItem>
+              <MenuItem component={<Link to="/admin/manage-publishes" />}>
+                Nhà xuất bản
+              </MenuItem>
             </SubMenu>
             <MenuItem component={<Link to="/admin/manage-order" />}>
               <div className="flex items-center gap-4">
@@ -116,8 +130,13 @@ const ManageContact = () => {
                 Quản lý voucher
               </div>
             </MenuItem>
-            <SubMenu label="Quản lý bài viết" icon={<FaRegEdit className="w-5 h-5" />}>
-              <MenuItem component={<Link to="/admin/manage-blog" />}>Danh sách bài viết</MenuItem>
+            <SubMenu
+              label="Quản lý bài viết"
+              icon={<FaRegEdit className="w-5 h-5" />}
+            >
+              <MenuItem component={<Link to="/admin/manage-blog" />}>
+                Danh sách bài viết
+              </MenuItem>
             </SubMenu>
             <MenuItem component={<Link to="/admin/manage-contact" />}>
               <div className="flex items-center gap-4">
@@ -127,7 +146,7 @@ const ManageContact = () => {
             </MenuItem>
             <MenuItem component={<Link to="/admin/stock" />}>
               <div className="flex items-center gap-4">
-              <MdInventory />
+                <MdInventory />
                 Quản lý tồn kho
               </div>
             </MenuItem>
@@ -139,7 +158,10 @@ const ManageContact = () => {
             </MenuItem>
           </Menu>
         </Sidebar>
-        <button onClick={() => setCollapsed(!collapsed)} className="toggle-button">
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="toggle-button"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -183,11 +205,20 @@ const ManageContact = () => {
                     {/* <td>{contact.status}</td> */}
                     <td>
                       <div className="flex items-center justify-center gap-3">
-                        <button type="button"
+                        <button
+                          type="button"
                           onClick={() => handleUpdateStatus(contact._id)}
                           className="w-28 text-[12px] justify-items-center p-1 rounded-lg text-white cursor-pointer"
-                          style={{ backgroundColor: contact.status === "Chưa phản hồi" ? "#ef4444" : "#166534", }}>
-                          {contact.status === "Đã phản hồi" ? "Đã phản hồi" : "Chưa phản hồi"}
+                          style={{
+                            backgroundColor:
+                              contact.status === "Chưa phản hồi"
+                                ? "#ef4444"
+                                : "#166534",
+                          }}
+                        >
+                          {contact.status === "Đã phản hồi"
+                            ? "Đã phản hồi"
+                            : "Chưa phản hồi"}
                         </button>
                       </div>
                     </td>
@@ -195,11 +226,11 @@ const ManageContact = () => {
                       <div className="flex items-center justify-center gap-3">
                         <button
                           onClick={() => handleDeleteContact(contact._id)}
-                          className="w-20 p-1 justify-items-center rounded-lg bg-red-500 text-black">
+                          className="w-20 p-1 justify-items-center rounded-lg bg-red-500 text-black"
+                        >
                           <FaTrashAlt className="w-5 h-4 text-red" />
                         </button>
                       </div>
-
                     </td>
                   </tr>
                 ))}

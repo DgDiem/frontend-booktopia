@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
-import { FaBook, FaClipboardList, FaRegEdit, FaUser, FaGift } from "react-icons/fa";
+import {
+  FaBook,
+  FaClipboardList,
+  FaRegEdit,
+  FaUser,
+  FaGift,
+} from "react-icons/fa";
 import { MdLogout } from "react-icons/md";
 import { AiFillDashboard, AiOutlineBars } from "react-icons/ai";
 import { MdMarkEmailRead } from "react-icons/md";
@@ -13,6 +19,7 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import Swal from "sweetalert2";
 import HeaderAdmin from "../../../components/HeaderAdmin/HeaderAdmin";
+import { URL_API } from "../../../constants/constants";
 
 const AddProduct = () => {
   const [selectedImages, setSelectedImages] = useState({});
@@ -23,7 +30,7 @@ const AddProduct = () => {
   useEffect(() => {
     const fetchListCategory = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/category");
+        const response = await axios.get(`${URL_API}/category`);
         setListCategory(response.data);
       } catch (error) {
         console.log(error);
@@ -32,7 +39,7 @@ const AddProduct = () => {
 
     const fetchListAuthor = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/authors");
+        const response = await axios.get(`${URL_API}/authors`);
         setListAuthor(response.data);
       } catch (error) {
         console.log(error);
@@ -41,7 +48,7 @@ const AddProduct = () => {
 
     const fetchListPublishes = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/publishes");
+        const response = await axios.get(`${URL_API}/publishes`);
         setListPublishes(response.data);
         console.log("List of publishes:", response.data);
       } catch (error) {
@@ -99,7 +106,7 @@ const AddProduct = () => {
         }
       });
 
-      const response = await axios.post("http://localhost:3000/products", formData, {
+      const response = await axios.post(`${URL_API}/products`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -133,8 +140,11 @@ const AddProduct = () => {
   return (
     <div className="flex min-h-screen border">
       <Sidebar
-        className={`relative border p-3 bg-white ${collapsed ? "collapsed" : "expanded"}`}
-        width={collapsed ? "0px" : "270px"}>
+        className={`relative border p-3 bg-white ${
+          collapsed ? "collapsed" : "expanded"
+        }`}
+        width={collapsed ? "0px" : "270px"}
+      >
         <Menu className="bg-white">
           <div className="flex items-center justify-center mb-6">
             <img src="./images/logo.png" alt="Logo" />
@@ -146,13 +156,27 @@ const AddProduct = () => {
             </div>
           </MenuItem>
 
-          <SubMenu label="Quản lý danh mục" icon={<AiOutlineBars className="w-5 h-5" />}>
-            <MenuItem component={<Link to="/admin/manage-category" />}>Danh sách danh mục</MenuItem>
+          <SubMenu
+            label="Quản lý danh mục"
+            icon={<AiOutlineBars className="w-5 h-5" />}
+          >
+            <MenuItem component={<Link to="/admin/manage-category" />}>
+              Danh sách danh mục
+            </MenuItem>
           </SubMenu>
-          <SubMenu label="Quản lý sản phẩm" icon={<FaBook className="w-5 h-5" />}>
-            <MenuItem component={<Link to="/admin/manage-product" />}>Danh sách sản phẩm</MenuItem>
-            <MenuItem component={<Link to="/admin/manage-author" />}>Tác giả</MenuItem>
-            <MenuItem component={<Link to="/admin/manage-publishes" />}>Nhà xuất bản</MenuItem>
+          <SubMenu
+            label="Quản lý sản phẩm"
+            icon={<FaBook className="w-5 h-5" />}
+          >
+            <MenuItem component={<Link to="/admin/manage-product" />}>
+              Danh sách sản phẩm
+            </MenuItem>
+            <MenuItem component={<Link to="/admin/manage-author" />}>
+              Tác giả
+            </MenuItem>
+            <MenuItem component={<Link to="/admin/manage-publishes" />}>
+              Nhà xuất bản
+            </MenuItem>
           </SubMenu>
           <MenuItem component={<Link to="/admin/manage-items" />}>
             <div className="flex items-center gap-4">
@@ -167,26 +191,31 @@ const AddProduct = () => {
             </div>
           </MenuItem>
           <MenuItem component={<Link to="/admin/manage-voucher" />}>
-              <div className="flex items-center gap-4">
-                <FaGift />
-                Quản lý voucher
-              </div>
+            <div className="flex items-center gap-4">
+              <FaGift />
+              Quản lý voucher
+            </div>
+          </MenuItem>
+          <SubMenu
+            label="Quản lý bài viết"
+            icon={<FaRegEdit className="w-5 h-5" />}
+          >
+            <MenuItem component={<Link to="/admin/manage-blog" />}>
+              Danh sách bài viết
             </MenuItem>
-          <SubMenu label="Quản lý bài viết" icon={<FaRegEdit className="w-5 h-5" />}>
-            <MenuItem component={<Link to="/admin/manage-blog" />}>Danh sách bài viết</MenuItem>
           </SubMenu>
           <MenuItem component={<Link to="/admin/manage-contact" />}>
-              <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4">
               <MdInventory />
-                Quản lý liên hệ
-              </div>
-            </MenuItem>
-            <MenuItem component={<Link to="/admin/stock" />}>
-              <div className="flex items-center gap-4">
-                <MdMarkEmailRead />
-                Quản lý tồn kho
-              </div>
-            </MenuItem>
+              Quản lý liên hệ
+            </div>
+          </MenuItem>
+          <MenuItem component={<Link to="/admin/stock" />}>
+            <div className="flex items-center gap-4">
+              <MdMarkEmailRead />
+              Quản lý tồn kho
+            </div>
+          </MenuItem>
           <MenuItem onClick={handleLogout}>
             <div className="flex items-center gap-4">
               <MdLogout />
@@ -196,13 +225,17 @@ const AddProduct = () => {
         </Menu>
       </Sidebar>
       {/* Nút toggle nằm bên ngoài Sidebar */}
-      <button onClick={() => setCollapsed(!collapsed)} className="toggle-button">
+      <button
+        onClick={() => setCollapsed(!collapsed)}
+        className="toggle-button"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
           strokeWidth={1.5}
-          stroke="currentColor">
+          stroke="currentColor"
+        >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -216,7 +249,10 @@ const AddProduct = () => {
           <PageTitle title="Thêm sản phẩm" className="text-mainDark" />
         </div>
         <div className="border rounded-[10px] py-8 px-5 mt-7">
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col gap-6"
+          >
             <div className="flex gap-10 items-center">
               <div className="w-full flex flex-col gap-2">
                 <label htmlFor="product-name">*Tên sản phẩm</label>
@@ -224,22 +260,29 @@ const AddProduct = () => {
                   type="text"
                   {...register("name", { required: true })}
                   id="product-name"
-                  className={`input input-bordered w-full ${errors.name ? "border-red-500" : ""}`}
+                  className={`input input-bordered w-full ${
+                    errors.name ? "border-red-500" : ""
+                  }`}
                 />
-                {errors.name && <span className="text-red">Tên sản phẩm là bắt buộc</span>}
+                {errors.name && (
+                  <span className="text-red">Tên sản phẩm là bắt buộc</span>
+                )}
               </div>
               <div className="w-full flex flex-col gap-2">
                 <label htmlFor="author">Tác giả</label>
                 <select
                   className="select select-bordered w-full"
-                  {...register("author", { required: true })}>
+                  {...register("author", { required: true })}
+                >
                   {listAuthor.map((item) => (
                     <option key={item._id} value={item._id}>
                       {item.name}
                     </option>
                   ))}
                 </select>
-                {errors.author && <span className="text-red">Tác giả là bắt buộc</span>}
+                {errors.author && (
+                  <span className="text-red">Tác giả là bắt buộc</span>
+                )}
               </div>
             </div>
             <div className="flex flex-col gap-6">
@@ -269,9 +312,13 @@ const AddProduct = () => {
                   type="number"
                   {...register("price1", { required: true })}
                   id="price1"
-                  className={`input input-bordered w-full ${errors.price1 ? "border-red-500" : ""}`}
+                  className={`input input-bordered w-full ${
+                    errors.price1 ? "border-red-500" : ""
+                  }`}
                 />
-                {errors.price1 && <span className="text-red">Giá tiền nhập là bắt buộc</span>}
+                {errors.price1 && (
+                  <span className="text-red">Giá tiền nhập là bắt buộc</span>
+                )}
               </div>
               <div className="w-full flex flex-col gap-2">
                 <label htmlFor="price2">*Giá giảm</label>
@@ -279,9 +326,13 @@ const AddProduct = () => {
                   type="number"
                   {...register("price2")}
                   id="price2"
-                  className={`input input-bordered w-full ${errors.price2 ? "border-red-500" : ""}`}
+                  className={`input input-bordered w-full ${
+                    errors.price2 ? "border-red-500" : ""
+                  }`}
                 />
-                {errors.price2 && <span className="text-red">Giá tiền bán là bắt buộc</span>}
+                {errors.price2 && (
+                  <span className="text-red">Giá tiền bán là bắt buộc</span>
+                )}
               </div>
             </div>
             <div className="flex gap-10 items-center">
@@ -289,27 +340,33 @@ const AddProduct = () => {
                 <label htmlFor="category">Danh mục</label>
                 <select
                   className="select select-bordered w-full"
-                  {...register("category", { required: true })}>
+                  {...register("category", { required: true })}
+                >
                   {listCategory.map((item) => (
                     <option key={item._id} value={item._id}>
                       {item.name}
                     </option>
                   ))}
                 </select>
-                {errors.category && <span className="text-red">Danh mục là bắt buộc</span>}
+                {errors.category && (
+                  <span className="text-red">Danh mục là bắt buộc</span>
+                )}
               </div>
               <div className="w-full flex flex-col gap-2">
                 <label htmlFor="publish">Nhà xuất bản</label>
                 <select
                   className="select select-bordered w-full"
-                  {...register("publish", { required: true })}>
+                  {...register("publish", { required: true })}
+                >
                   {listPublishes.map((item) => (
                     <option key={item._id} value={item._id}>
                       {item.name}
                     </option>
                   ))}
                 </select>
-                {errors.publish && <span className="text-red">Nhà xuất bản là bắt buộc</span>}
+                {errors.publish && (
+                  <span className="text-red">Nhà xuất bản là bắt buộc</span>
+                )}
               </div>
             </div>
             <div className="w-full flex flex-col gap-2">
@@ -319,8 +376,11 @@ const AddProduct = () => {
                 className={`textarea textarea-bordered w-full ${
                   errors.description ? "border-red-500" : ""
                 }`}
-                {...register("description", { required: true })}></textarea>
-              {errors.description && <span className="text-red">Mô tả là bắt buộc</span>}
+                {...register("description", { required: true })}
+              ></textarea>
+              {errors.description && (
+                <span className="text-red">Mô tả là bắt buộc</span>
+              )}
             </div>
             <div className="w-full flex flex-col gap-2">
               <label htmlFor="quantity">*Số lượng</label>
@@ -328,9 +388,13 @@ const AddProduct = () => {
                 type="number"
                 {...register("quantity", { required: true })}
                 id="quantity"
-                className={`input input-bordered w-full ${errors.quantity ? "border-red-500" : ""}`}
+                className={`input input-bordered w-full ${
+                  errors.quantity ? "border-red-500" : ""
+                }`}
               />
-              {errors.quantity && <span className="text-red">Số lượng là bắt buộc</span>}
+              {errors.quantity && (
+                <span className="text-red">Số lượng là bắt buộc</span>
+              )}
             </div>
             <div className="flex items-center gap-3">
               <Button>Lưu</Button>
