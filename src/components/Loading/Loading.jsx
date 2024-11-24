@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { RotatingSquare } from "react-loader-spinner";
 
 const Loading = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
