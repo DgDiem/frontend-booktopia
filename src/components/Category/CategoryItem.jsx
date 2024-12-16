@@ -1,12 +1,6 @@
 import React from "react";
 
-const CategoryItem = ({
-  title,
-  items,
-  onCategoryClick,
-  onAuthorClick,
-  onPublishClick,
-}) => {
+const CategoryItem = ({ title, items, onCategoryClick, onAuthorClick, onPublishClick }) => {
   const handleClick = (e, id, name, type) => {
     e.preventDefault(); // Chặn hành vi mặc định của thẻ <a>
 
@@ -31,9 +25,7 @@ const CategoryItem = ({
   return (
     <div>
       {title && (
-        <h3 className="text-mainDark text-price font-semibold leading-normal mb-7">
-          {title}
-        </h3>
+        <h3 className="text-mainDark text-price font-semibold leading-normal mb-7">{title}</h3>
       )}
       <ul className="flex flex-col gap-7">
         {title === "Danh mục" && (
@@ -41,10 +33,7 @@ const CategoryItem = ({
             <a
               href="#"
               className="text-text leading-normal font-normal menu-link"
-              onClick={(e) =>
-                handleClick(e, null, "Tất cả sản phẩm", "category")
-              }
-            >
+              onClick={(e) => handleClick(e, null, "Tất cả sản phẩm", "category")}>
               Tất cả sản phẩm
             </a>
           </li>
@@ -56,8 +45,7 @@ const CategoryItem = ({
               <a
                 href="#"
                 className="text-text leading-normal font-normal menu-link"
-                onClick={(e) => handleClick(e, item._id, item.name, type)}
-              >
+                onClick={(e) => handleClick(e, item._id, item.name, type)}>
                 {item.name}
               </a>
             </li>

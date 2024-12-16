@@ -28,10 +28,8 @@ const Menu = () => {
   const [pageGroup, setPageGroup] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalProducts, setTotalProducts] = useState(0);
-
   const [currentCategoryName, setCurrentCategoryName] =
     useState("Tất cả sản phẩm");
-
   const navigate = useNavigate();
   const pagesPerGroup = 3;
 
@@ -43,7 +41,6 @@ const Menu = () => {
       setLoading(true);
       try {
         const url = `${URL_API}/products/search/${searchTerm.trim()}`;
-
         const response = await axios.get(url);
         setProducts(response.data);
         setCategoryId(null); // Xóa bộ lọc hiện tại khi tìm kiếm
@@ -105,7 +102,7 @@ const Menu = () => {
             currentPage - 1
           }&limit=${limit}`;
         } else if (publishId) {
-          url = `${URL_API}/products/paginated/publishId/${publishId}?pageNumber=${
+          url = `${URL_API}/products/paginated/publisherId/${publishId}?pageNumber=${
             currentPage - 1
           }&limit=${limit}`;
         }
@@ -134,36 +131,6 @@ const Menu = () => {
   }, [categoryId, authorId, publishId, currentPage, sortOption, searchTerm]);
 
   const categoryClick = async (newCategoryId, categoryName) => {
-    if (newCategoryId === null) {
-      setCategoryId(null);
-      setAuthorId(null);
-      setPublishId(null);
-      setCurrentCategoryName("Tất cả sản phẩm");
-      setCurrentPage(1);
-      setSortOption("Mới nhất");
-      setProducts([]);
-      setPageGroup(0);
-
-      try {
-        setLoading(true);
-        const limit = 12;
-        const url = `${URL_API}/products/paginated/products?pageNumber=0&limit=${limit}&sortBy=new`;
-        const response = await axios.get(url);
-        console.log("Fetching URL:", url);
-        console.log("Response data:", response.data);
-
-        setProducts(response.data.products);
-        setTotalPages(response.data.totalPages);
-        window.location.reload("true");
-
-      } catch (error) {
-        console.error("Lỗi khi fetch tất cả sản phẩm:", error);
-      } finally {
-        setLoading(false);
-      }
-      return;
-    }
-
     if (categoryId === newCategoryId) {
       return;
     }
@@ -172,17 +139,16 @@ const Menu = () => {
     setPublishId(null);
     setCurrentCategoryName(categoryName);
     setCurrentPage(1);
-    setProducts([]);
+    setProducts([]); // Xóa sản phẩm cũ trước khi fetch
     setSortOption("Mới nhất");
     setPageGroup(0);
+
+    // Fetch lại sản phẩm ngay lập tức
     try {
       setLoading(true);
       const limit = 12;
       const url = `${URL_API}/products/paginated/categoryId/${newCategoryId}?pageNumber=0&limit=${limit}&sortBy=new`;
-
       const response = await axios.get(url);
-      console.log("Fetching URL:", url);
-      console.log("Response data:", response.data);
       setProducts(response.data.products);
       setTotalPages(response.data.totalPages);
     } catch (error) {
@@ -200,15 +166,14 @@ const Menu = () => {
     setSortOption("Mới nhất");
     setPageGroup(0);
     setCurrentPage(1);
-    setProducts([]);
+    setProducts([]); // Xóa sản phẩm cũ trước khi fetch
 
+    // Fetch lại sản phẩm ngay lập tức
     try {
       setLoading(true);
       const limit = 12;
       const url = `${URL_API}/products/paginated/authorId/${newAuthorId}?pageNumber=0&limit=${limit}&sortBy=new`;
       const response = await axios.get(url);
-      console.log("Fetching URL:", url);
-      console.log("Response data:", response.data);
       setProducts(response.data.products);
       setTotalPages(response.data.totalPages);
     } catch (error) {
@@ -232,11 +197,8 @@ const Menu = () => {
     try {
       setLoading(true);
       const limit = 12;
-
-      const url = `${URL_API}/products/paginated/publishId/${newPublishId}?pageNumber=0&limit=${limit}&sortBy=new`;
+      const url = `${URL_API}/products/paginated/publisherId/${newPublishId}?pageNumber=0&limit=${limit}&sortBy=new`;
       const response = await axios.get(url);
-      console.log("Fetching URL:", url);
-      console.log("Response data:", response.data);
       setProducts(response.data.products);
       setTotalPages(response.data.totalPages);
     } catch (error) {
@@ -245,7 +207,6 @@ const Menu = () => {
       setLoading(false);
     }
   };
-
   const handleNextGroup = () => {
     const nextPageGroup = pageGroup + 1;
     const totalPages = Math.ceil(totalProducts / pagesPerGroup);
@@ -282,15 +243,21 @@ const Menu = () => {
   }, []);
   const renderPageButtons = () => {
     const startPage = pageGroup * pagesPerGroup + 1;
-    const pages = Array.from({ length: pagesPerGroup }, (_, i) => startPage + i);
+    const pages = Array.from(
+      { length: pagesPerGroup },
+      (_, i) => startPage + i
+    );
 
     return pages.map((page) => (
       <span
         key={page}
         className={`w-10 h-10 rounded-full flex items-center justify-center ${
-          currentPage === page ? "bg-mainDark text-white" : "border text-grayText"
+          currentPage === page
+            ? "bg-mainDark text-white"
+            : "border text-grayText"
         } text-[20px] font-semibold cursor-pointer`}
-        onClick={() => setCurrentPage(page)}>
+        onClick={() => setCurrentPage(page)}
+      >
         {page}
       </span>
     ));
@@ -307,7 +274,7 @@ const Menu = () => {
     setCurrentPage(pageNumber);
     const newGroup = Math.floor((pageNumber - 1) / pagesPerGroup);
     if (newGroup !== pageGroup) {
-      setPageGroup(newGroup);
+      setPageGroup(newGroup); // Đồng bộ nhóm nếu trang thay đổi vượt nhóm
     }
   };
 
@@ -324,7 +291,11 @@ const Menu = () => {
                     items={categories}
                     onCategoryClick={categoryClick}
                   />
-                  <CategoryItem title="Tác giả" items={authors} onAuthorClick={authorClick} />
+                  <CategoryItem
+                    title="Tác giả"
+                    items={authors}
+                    onAuthorClick={authorClick}
+                  />
                   <CategoryItem
                     title="Nhà xuất bản"
                     items={publishers}
@@ -335,28 +306,18 @@ const Menu = () => {
             </div>
             <div className="w-full">
               <div className="flex items-center justify-between mb-6">
-
-                {searchTerm.trim() ? (
-                  <PageTitle title="Kết quả tìm kiếm" />
-                ) : (
-                  <>
-                    <PageTitle
-                      title={currentCategoryName || "Tất cả sản phẩm"}
-                    />
-                    <div className="flex items-center gap-4">
-                      <select
-                        className="select select-bordered w-full max-w-xs custom-select"
-                        value={sortOption}
-                        onChange={(e) => setSortOption(e.target.value)}
-                      >
-                        <option value="Mới nhất">Mới nhất</option>
-                        <option value="Giá tăng dần">Giá tăng dần</option>
-                        <option value="Giá giảm dần">Giá giảm dần</option>
-                      </select>
-                    </div>
-                  </>
-                )}
-
+                <PageTitle title={currentCategoryName || "Tất cả sản phẩm"} />
+                <div className="flex items-center gap-4">
+                  <select
+                    className="select select-bordered w-full max-w-xs custom-select"
+                    value={sortOption}
+                    onChange={(e) => setSortOption(e.target.value)}
+                  >
+                    <option value="Mới nhất">Mới nhất</option>
+                    <option value="Giá tăng dần">Giá tăng dần</option>
+                    <option value="Giá giảm dần">Giá giảm dần</option>
+                  </select>
+                </div>
               </div>
 
               {loading ? (
@@ -373,37 +334,25 @@ const Menu = () => {
                 </div>
               )}
               <div className="flex items-center justify-center gap-5 mt-6">
+                <span
+                  className="w-10 h-10 rounded-full flex items-center justify-center border text-grayText text-[20px] font-semibold hover:bg-mainDark hover:text-white cursor-pointer"
+                  onClick={handlePrevGroup}
+                >
+                  <FaLongArrowAltLeft />
+                </span>
 
-                {searchTerm.trim() && products.length === 0 ? (
-                  <span className="text-gray-500">
-                    Không tìm thấy sản phẩm nào.
-                  </span>
-                ) : (
-                  !searchTerm.trim() && (
-                    <>
-                      <span
-                        className="w-10 h-10 rounded-full flex items-center justify-center border text-grayText text-[20px] font-semibold hover:bg-mainDark hover:text-white cursor-pointer"
-                        onClick={handlePrevGroup}
-                      >
-                        <FaLongArrowAltLeft />
-                      </span>
+                {renderPageButtons()}
 
-                      {renderPageButtons()}
-
-                      <span
-                        className={`w-10 h-10 rounded-full flex items-center justify-center border text-grayText text-[20px] font-semibold ${
-                          isNextGroupDisabled()
-                            ? "cursor-not-allowed opacity-50"
-                            : "hover:bg-mainDark hover:text-white cursor-pointer"
-                        }`}
-                        onClick={isNextGroupDisabled() ? null : handleNextGroup}
-                      >
-                        <FaLongArrowAltRight />
-                      </span>
-                    </>
-                  )
-                )}
-               
+                <span
+                  className={`w-10 h-10 rounded-full flex items-center justify-center border text-grayText text-[20px] font-semibold ${
+                    isNextGroupDisabled()
+                      ? "cursor-not-allowed opacity-50"
+                      : "hover:bg-mainDark hover:text-white cursor-pointer"
+                  }`}
+                  onClick={isNextGroupDisabled() ? null : handleNextGroup} // Ngăn chặn sự kiện click nếu nút bị vô hiệu hóa
+                >
+                  <FaLongArrowAltRight />
+                </span>
               </div>
             </div>
           </div>

@@ -328,9 +328,6 @@ const Checkout = () => {
                     Chọn Thành Phố:
                   </label>
                   <select
-                    {...register("city", {
-                      required: "Vui lòng chọn thành phố",
-                    })}
                     value={selectedCity}
                     onChange={handleCityChange}
                     className="input input-bordered w-full">
@@ -341,18 +338,12 @@ const Checkout = () => {
                       </option>
                     ))}
                   </select>
-                  {errors.city && (
-                    <p className="errform text-red">{errors.city.message}</p>
-                  )}
                 </div>
 
                 {selectedCity && (
                   <div>
                     <label className="block mb-2">Chọn Quận Huyện:</label>
                     <select
-                      {...register("district", {
-                        required: "Vui lòng chọn quận/huyện",
-                      })}
                       value={selectedDistrict}
                       onChange={handleDistrictChange}
                       className="input input-bordered w-full">
@@ -363,11 +354,6 @@ const Checkout = () => {
                         </option>
                       ))}
                     </select>
-                    {errors.district && (
-                      <p className="errform text-red">
-                        {errors.district.message}
-                      </p>
-                    )}
                   </div>
                 )}
 
@@ -375,9 +361,6 @@ const Checkout = () => {
                   <div>
                     <label className="block mb-2">Chọn Phường Xã:</label>
                     <select
-                      {...register("ward", {
-                        required: "Vui lòng chọn phường/xã",
-                      })}
                       value={selectedWard}
                       onChange={(e) => setSelectedWard(e.target.value)}
                       className="input input-bordered w-full">
@@ -388,9 +371,6 @@ const Checkout = () => {
                         </option>
                       ))}
                     </select>
-                    {errors.ward && (
-                      <p className="errform text-red">{errors.ward.message}</p>
-                    )}
                   </div>
                 )}
               </div>
@@ -404,9 +384,6 @@ const Checkout = () => {
                   <div className="flex items-center gap-3">
                     <label htmlFor="giaohang" className="checkbox-style">
                       <input
-                        // {...register("shippingMethod", {
-                        //   required: "Vui lòng chọn phương thức vận chuyển",
-                        // })}
                         type="checkbox"
                         name="giaohang"
                         id="giaohang"
@@ -418,11 +395,6 @@ const Checkout = () => {
                   </div>
                   <div className="ml-10">30.000đ</div>
                 </div>
-                {errors.shippingMethod && (
-                  <p className="errform text-red">
-                    {errors.shippingMethod.message}
-                  </p>
-                )}
               </div>
 
               {/* Phương thức thanh toán */}

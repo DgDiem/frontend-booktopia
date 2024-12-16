@@ -25,8 +25,6 @@ const ManageComment = () => {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [user, setUser] = useState({});
-  const [listComment, setListComment] = useState([]);
-
   // Lấy dữ liệu người dùng từ cookie
   useEffect(() => {
     const userData = Cookies.get("user");
@@ -36,6 +34,16 @@ const ManageComment = () => {
     }
   }, []);
 
+  // Đăng xuất xóa cookie người dùng
+  const handleLogout = () => {
+    // Xử lý logout, ví dụ xóa cookie và chuyển hướng người dùng
+    Cookies.remove("user");
+    setUser(null);
+    // Chuyển hướng hoặc cập nhật state để hiển thị UI phù hợp
+    navigate("/sign-in");
+    window.location.reload();
+  };
+  const [listComment, setListComment] = useState([]);
   useEffect(() => {
     const fetchDataComment = async () => {
       try {
@@ -49,15 +57,15 @@ const ManageComment = () => {
     fetchDataComment();
   }, []);
 
-  // Đăng xuất xóa cookie người dùng
-  const handleLogout = () => {
-    // Xử lý logout, ví dụ xóa cookie và chuyển hướng người dùng
-    Cookies.remove("user");
-    setUser(null);
-    // Chuyển hướng hoặc cập nhật state để hiển thị UI phù hợp
-    navigate("/sign-in");
-    window.location.reload();
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${URL_API}/users/${id}`);
+      showSwalFireDelete("Xóa người dùng thành công");
+    } catch (error) {
+      console.log(error);
+    }
   };
+
   return (
     <div>
       <div className="flex min-h-screen border">
@@ -131,7 +139,12 @@ const ManageComment = () => {
                 Quản lý bình luận
               </div>
             </MenuItem>
-
+            <MenuItem component={<Link to="/admin/manage-review" />}>
+              <div className="flex items-center gap-4">
+                <MdOutlinePreview />
+                Quản lý đánh giá
+              </div>
+            </MenuItem>
             <MenuItem onClick={handleLogout}>
               <div className="flex items-center gap-4">
                 <MdLogout />
@@ -175,14 +188,14 @@ const ManageComment = () => {
               <tbody>
                 {listComment && listComment.length > 0 ? (
                   listComment.map((item, index) => {
-                    const dateObj = new Date(item.day);
+                    const dateObj = new Date(item.day); // Chắc bạn muốn lấy ngày từ `item.date` chứ không phải `order.date`
                     const formattedDate = dateObj.toLocaleDateString("vi-VN"); // 'vi-VN' for dd/mm/yyyy format
                     return (
                       <tr key={item._id}>
                         <td>{index + 1}</td>
                         <td>{item?.user?.name}</td>
                         <td>{item.content}</td>
-                        <td>{formattedDate}</td>
+                        <td>{formattedDate}</td> {/* Sửa phần hiển thị ngày */}
                         <td>
                           <div className="flex items-center justify-center gap-3">
                             <button>

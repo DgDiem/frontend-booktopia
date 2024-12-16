@@ -25,6 +25,7 @@ const ManageContact = () => {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [user, setUser] = useState({});
+  // Lấy dữ liệu người dùng từ cookie
   useEffect(() => {
     const userData = Cookies.get("user");
     if (userData) {
@@ -33,9 +34,12 @@ const ManageContact = () => {
     }
   }, []);
 
+  // Đăng xuất xóa cookie người dùng
   const handleLogout = () => {
+    // Xử lý logout, ví dụ xóa cookie và chuyển hướng người dùng
     Cookies.remove("user");
     setUser(null);
+    // Chuyển hướng hoặc cập nhật state để hiển thị UI phù hợp
     navigate("/sign-in");
     window.location.reload();
   };
@@ -44,7 +48,9 @@ const ManageContact = () => {
   useEffect(() => {
     const fetchContacts = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/contact/api/contacts");
+        const response = await axios.get(
+          "http://localhost:3000/contact/api/contacts"
+        );
         setContacts(response.data);
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu liên hệ:", error);
@@ -56,7 +62,9 @@ const ManageContact = () => {
 
   const handleUpdateStatus = async (id) => {
     try {
-      const response = await axios.patch(`http://localhost:3000/contact/api/contact/${id}/status`);
+      const response = await axios.patch(
+        `http://localhost:3000/contact/api/contact/${id}/status`
+      );
       const updatedContact = response.data.contact;
       setContacts((prevContacts) =>
         prevContacts.map((contact) =>
@@ -71,7 +79,9 @@ const ManageContact = () => {
   const handleDeleteContact = async (id) => {
     try {
       await axios.delete(`http://localhost:3000/contact/api/contact/${id}`);
-      setContacts((prevContacts) => prevContacts.filter((contact) => contact._id !== id));
+      setContacts((prevContacts) =>
+        prevContacts.filter((contact) => contact._id !== id)
+      );
       toast.success("Xóa thành công!");
     } catch (error) {
       toast.error("Liên hệ chưa phản hồi không được xóa!");
@@ -83,90 +93,109 @@ const ManageContact = () => {
 
       <div className="flex min-h-screen border">
         <Sidebar
-          className={`relative border p-3 bg-white ${collapsed ? "collapsed" : "expanded"}`}
-          width={collapsed ? "0px" : "270px"}>
-          <Menu className="bg-white">
-            <div className="flex items-center justify-center mb-6">
-              <img src="./images/logo.png" alt="Logo" />
-            </div>
-            <MenuItem component={<Link to="/admin/dashboard" />}>
-              <div className="flex items-center gap-4">
-                <AiFillDashboard className="w-5 h-5" />
-                Dashboard
-              </div>
-            </MenuItem>
-            <SubMenu label="Quản lý sản phẩm" icon={<FaBook className="w-5 h-5" />}>
-              <MenuItem component={<Link to="/admin/manage-product" />}>
-                Danh sách sản phẩm
-              </MenuItem>
-              <MenuItem component={<Link to="/admin/manage-author" />}>Tác giả</MenuItem>
-              <MenuItem component={<Link to="/admin/manage-publishes" />}>Nhà xuất bản</MenuItem>
-            </SubMenu>
-            <MenuItem component={<Link to="/admin/manage-category" />}>
-              <div className="flex items-center gap-4">
-                <AiOutlineBars className="w-5 h-5" />
-                Quản lý danh mục
-              </div>
-            </MenuItem>
-
-            <MenuItem component={<Link to="/admin/manage-order" />}>
-              <div className="flex items-center gap-4">
-                <FaClipboardList className="w-5 h-5" />
-                Quản lý đơn hàng
-              </div>
-            </MenuItem>
-            <MenuItem component={<Link to="/admin/manage-user" />}>
-              <div className="flex items-center gap-4">
-                <FaUser />
-                Quản lý tài khoản
-              </div>
-            </MenuItem>
-            <MenuItem component={<Link to="/admin/manage-voucher" />}>
-              <div className="flex items-center gap-4">
-                <FaGift />
-                Quản lý voucher
-              </div>
-            </MenuItem>
-            <MenuItem component={<Link to="/admin/manage-blog" />}>
-              <div className="flex items-center gap-4">
-                <FaRegEdit className="w-5 h-5" />
-                Quản lý bài viết
-              </div>
-            </MenuItem>
-            <MenuItem component={<Link to="/admin/manage-contact" />}>
-              <div className="flex items-center gap-4">
-                <MdMarkEmailRead />
-                Quản lý liên hệ
-              </div>
-            </MenuItem>
-            <MenuItem component={<Link to="/admin/stock" />}>
-              <div className="flex items-center gap-4">
-                <MdInventory />
-                Quản lý tồn kho
-              </div>
-            </MenuItem>
-            <MenuItem component={<Link to="/admin/manage-comment" />}>
-              <div className="flex items-center gap-4">
-                <FaCommentAlt />
-                Quản lý bình luận
-              </div>
-            </MenuItem>
-
-            <MenuItem onClick={handleLogout}>
-              <div className="flex items-center gap-4">
-                <MdLogout />
-                Đăng xuất
-              </div>
-            </MenuItem>
-          </Menu>
+          className={`relative border p-3 bg-white ${
+            collapsed ? "collapsed" : "expanded"
+          }`}
+          width={collapsed ? "0px" : "270px"}
+        >
+        <Menu className="bg-white">
+        <div className="flex items-center justify-center mb-6">
+          <img src="./images/logo.png" alt="Logo" />
+        </div>
+        <MenuItem component={<Link to="/admin/dashboard" />}>
+          <div className="flex items-center gap-4">
+            <AiFillDashboard className="w-5 h-5" />
+            Dashboard
+          </div>
+        </MenuItem>
+        <SubMenu
+          label="Quản lý sản phẩm"
+          icon={<FaBook className="w-5 h-5" />}
+        >
+          <MenuItem component={<Link to="/admin/manage-product" />}>
+            Danh sách sản phẩm
+          </MenuItem>
+          <MenuItem component={<Link to="/admin/manage-author" />}>
+            Tác giả
+          </MenuItem>
+          <MenuItem component={<Link to="/admin/manage-publishes" />}>
+            Nhà xuất bản
+          </MenuItem>
+        </SubMenu>
+        <MenuItem component={<Link to="/admin/manage-category" />}>
+          <div className="flex items-center gap-4">
+          <AiOutlineBars className="w-5 h-5" />
+            Quản lý danh mục
+          </div>
+        </MenuItem>
+        
+        <MenuItem component={<Link to="/admin/manage-order" />}>
+          <div className="flex items-center gap-4">
+            <FaClipboardList className="w-5 h-5" />
+            Quản lý đơn hàng
+          </div>
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/manage-user" />}>
+          <div className="flex items-center gap-4">
+            <FaUser />
+            Quản lý tài khoản
+          </div>
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/manage-voucher" />}>
+          <div className="flex items-center gap-4">
+            <FaGift />
+            Quản lý voucher
+          </div>
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/manage-blog" />}>
+          <div className="flex items-center gap-4">
+          <FaRegEdit className="w-5 h-5" />
+            Quản lý bài viết
+          </div>
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/manage-contact" />}>
+          <div className="flex items-center gap-4">
+            <MdMarkEmailRead />
+            Quản lý liên hệ
+          </div>
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/stock" />}>
+          <div className="flex items-center gap-4">
+            <MdInventory />
+            Quản lý tồn kho
+          </div>
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/manage-comment" />}>
+          <div className="flex items-center gap-4">
+            <FaCommentAlt />
+            Quản lý bình luận
+          </div>
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/manage-review" />}>
+          <div className="flex items-center gap-4">
+            <MdOutlinePreview />
+            Quản lý đánh giá
+          </div>
+        </MenuItem>
+        <MenuItem onClick={handleLogout}>
+          <div className="flex items-center gap-4">
+            <MdLogout />
+            Đăng xuất
+          </div>
+        </MenuItem>
+      </Menu>
         </Sidebar>
-        <button onClick={() => setCollapsed(!collapsed)} className="toggle-button">
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="toggle-button"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
-            stroke="currentColor">
+            stroke="currentColor"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -215,9 +244,14 @@ const ManageContact = () => {
                           className="w-28 text-[12px] justify-items-center p-1 rounded-lg text-white cursor-pointer"
                           style={{
                             backgroundColor:
-                              contact.status === "Chưa phản hồi" ? "#ef4444" : "#166534",
-                          }}>
-                          {contact.status === "Đã phản hồi" ? "Đã phản hồi" : "Chưa phản hồi"}
+                              contact.status === "Chưa phản hồi"
+                                ? "#ef4444"
+                                : "#166534",
+                          }}
+                        >
+                          {contact.status === "Đã phản hồi"
+                            ? "Đã phản hồi"
+                            : "Chưa phản hồi"}
                         </button>
                       </div>
                     </td>
@@ -225,7 +259,8 @@ const ManageContact = () => {
                       <div className="flex items-center justify-center gap-3">
                         <button
                           onClick={() => handleDeleteContact(contact._id)}
-                          className="w-20 p-1 justify-items-center rounded-lg bg-red-500 text-black">
+                          className="w-20 p-1 justify-items-center rounded-lg bg-red-500 text-black"
+                        >
                           <FaTrashAlt className="w-5 h-4 text-red" />
                         </button>
                       </div>

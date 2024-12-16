@@ -25,10 +25,19 @@ import PageTitle from "../../../components/PageTitle/PageTitle";
 import axios from "axios";
 import { URL_API } from "../../../constants/constants";
 import Cookies from "js-cookie";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Rectangle } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  Rectangle,
+} from "recharts";
 import { PieChart, Pie } from "recharts";
 import { MdMarkEmailRead } from "react-icons/md";
-import ReactPaginate from "react-paginate"; // Import thư viện react-paginate
+import ReactPaginate from 'react-paginate'; // Import thư viện react-paginate
 
 const Stock = () => {
   const isAdmin = true;
@@ -65,6 +74,8 @@ const Stock = () => {
         const response = await axios.get(`${URL_API}/products`);
         const data = response.data;
         setAllProductList(data);
+        console.log(data);
+
         // Phân trang sau khi lấy dữ liệu sản phẩm
         const endOffset = itemOffset + itemsPerPage;
         setCurrentItems(data.slice(itemOffset, endOffset));
@@ -88,8 +99,11 @@ const Stock = () => {
       <div className="flex min-h-screen border">
         {/* Sidebar */}
         <Sidebar
-          className={`relative border p-3 bg-white ${collapsed ? "collapsed" : "expanded"}`}
-          width={collapsed ? "0px" : "270px"}>
+          className={`relative border p-3 bg-white ${
+            collapsed ? "collapsed" : "expanded"
+          }`}
+          width={collapsed ? "0px" : "270px"}
+        >
           <Menu className="bg-white">
             <div className="flex items-center justify-center mb-6">
               <img src="./images/logo.png" alt="Logo" />
@@ -100,12 +114,19 @@ const Stock = () => {
                 Dashboard
               </div>
             </MenuItem>
-            <SubMenu label="Quản lý sản phẩm" icon={<FaBook className="w-5 h-5" />}>
+            <SubMenu
+              label="Quản lý sản phẩm"
+              icon={<FaBook className="w-5 h-5" />}
+            >
               <MenuItem component={<Link to="/admin/manage-product" />}>
                 Danh sách sản phẩm
               </MenuItem>
-              <MenuItem component={<Link to="/admin/manage-author" />}>Tác giả</MenuItem>
-              <MenuItem component={<Link to="/admin/manage-publishes" />}>Nhà xuất bản</MenuItem>
+              <MenuItem component={<Link to="/admin/manage-author" />}>
+                Tác giả
+              </MenuItem>
+              <MenuItem component={<Link to="/admin/manage-publishes" />}>
+                Nhà xuất bản
+              </MenuItem>
             </SubMenu>
             <MenuItem component={<Link to="/admin/manage-category" />}>
               <div className="flex items-center gap-4">
@@ -156,7 +177,12 @@ const Stock = () => {
                 Quản lý bình luận
               </div>
             </MenuItem>
-
+            <MenuItem component={<Link to="/admin/manage-review" />}>
+              <div className="flex items-center gap-4">
+                <MdOutlinePreview />
+                Quản lý đánh giá
+              </div>
+            </MenuItem>
             <MenuItem onClick={handleLogout}>
               <div className="flex items-center gap-4">
                 <MdLogout />
@@ -166,13 +192,17 @@ const Stock = () => {
           </Menu>
         </Sidebar>
         {/* Nút toggle nằm bên ngoài Sidebar */}
-        <button onClick={() => setCollapsed(!collapsed)} className="toggle-button">
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="toggle-button"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
-            stroke="currentColor">
+            stroke="currentColor"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -200,75 +230,74 @@ const Stock = () => {
                 </tr>
               </thead>
               <tbody>
-                {currentItems.map(
-                  (
-                    item,
-                    index // Sử dụng currentItems để hiển thị
-                  ) => (
-                    <tr key={item._id}>
-                      <td>{itemOffset + index + 1}</td> {/* Hiển thị số thứ tự chính xác */}
-                      <td>
-                        <img
-                          src={`${URL_API}/images/${item.image1}`}
-                          className="w-20 h-20"
-                          alt={item.name}
-                        />
-                      </td>
-                      <td>{item.name}</td>
-                      <td>{item.author?.authorName || "Chưa có"}</td>
-                      <td>{item.category?.categoryName || "Chưa có"}</td>
-                      <td>{item.publish?.publishName || "Chưa có"}</td>
-                      <td>
-                        <div className="flex items-center justify-center gap-4">
-                          <div>
-                            {item.price1.toLocaleString("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            })}
-                          </div>
-                          <div className="text-red">
-                            {item.price2?.toLocaleString("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            }) || "chưa có"}
-                          </div>
+                {currentItems.map((item, index) => ( // Sử dụng currentItems để hiển thị
+                  <tr key={item._id}>
+                    <td>{(itemOffset + index) + 1}</td> {/* Hiển thị số thứ tự chính xác */}
+                    <td>
+                      <img
+                        src={`${URL_API}/images/${item.image1}`}
+                        className="w-20 h-20"
+                        alt={item.name}
+                      />
+                    </td>
+                    <td>{item.name}</td>
+                    <td>{item.author?.authorName || "Chưa có"}</td>
+                    <td>{item.category?.categoryName || "Chưa có"}</td>
+                    <td>{item.publish?.publishName || "Chưa có"}</td>
+                    <td>
+                      <div className="flex items-center justify-center gap-4">
+                        <div>
+                          {item.price1.toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          })}
                         </div>
-                      </td>
-                      {item.quantity === 0 ? (
-                        <td className="text-red px-3 text-center">Hết hàng</td>
-                      ) : (
-                        <td className="px-3 text-center">{item.quantity}</td>
-                      )}
-                    </tr>
-                  )
-                )}
+                        <div className="text-red">
+                          {item.price2?.toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          }) || "chưa có"}
+                        </div>
+                      </div>
+                    </td>
+                    {item.quantity === 0 ? (
+                      <td className="text-red px-3 text-center">Hết hàng</td>
+                    ) : (
+                      <td className="px-3 text-center">{item.quantity}</td>
+                    )}
+                  </tr>
+                ))}
               </tbody>
             </table>
             {/* Phân trang */}
             <ReactPaginate
-              breakLabel={<span className="px-3 py-2 leading-tight text-gray-500">...</span>} // Thêm style cho breakLabel
-              nextLabel={"Sau"}
-              onPageChange={handlePageClick}
-              marginPagesDisplayed={1}
-              pageRangeDisplayed={3}
-              pageCount={pageCount}
-              previousLabel={"Trước"}
-              renderOnZeroPageCount={null}
-              containerClassName={"flex justify-center items-center"} // Thêm class Tailwind CSS
-              pageClassName={
-                "px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-              } // Thêm class cho từng nút trang
-              previousLinkClassName={
-                "px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 rounded-l-lg"
-              } // Thêm class cho nút "Trước"
-              nextLinkClassName={
-                "px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 rounded-r-lg"
-              } // Thêm class cho nút "Sau"
-              activeClassName={
-                "px-3 py-2 text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700"
-              } // Thêm class cho nút trang hiện tại
-              disabledClassName={"opacity-50 cursor-not-allowed"} // Thêm class cho nút bị vô hiệu hóa
-            />
+            breakLabel={
+              <span className="px-3 py-2 leading-tight text-gray-500">
+                ...
+              </span>
+            } // Thêm style cho breakLabel
+            nextLabel={"Sau"}
+            onPageChange={handlePageClick}
+            marginPagesDisplayed={1}
+            pageRangeDisplayed={3}
+            pageCount={pageCount}
+            previousLabel={"Trước"}
+            renderOnZeroPageCount={null}
+            containerClassName={"flex justify-center items-center"} // Thêm class Tailwind CSS
+            pageClassName={
+              "px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+            } // Thêm class cho từng nút trang
+            previousLinkClassName={
+              "px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 rounded-l-lg"
+            } // Thêm class cho nút "Trước"
+            nextLinkClassName={
+              "px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 rounded-r-lg"
+            }// Thêm class cho nút "Sau"
+            activeClassName={
+              "px-3 py-2 text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700"
+            } // Thêm class cho nút trang hiện tại
+            disabledClassName={"opacity-50 cursor-not-allowed"} // Thêm class cho nút bị vô hiệu hóa
+          />
           </div>
         </div>
       </div>

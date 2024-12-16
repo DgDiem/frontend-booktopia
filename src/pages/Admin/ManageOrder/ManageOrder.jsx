@@ -29,8 +29,6 @@ import PageTitle from "../../../components/PageTitle/PageTitle";
 import HeaderAdmin from "../../../components/HeaderAdmin/HeaderAdmin";
 import { URL_API } from "../../../constants/constants";
 import Cookies from "js-cookie";
-import { ToastContainer, toast } from "react-toastify";
-
 const ManageOrder = () => {
   const navigate = useNavigate();
   const [listOrder, setOrder] = useState([]);
@@ -79,12 +77,12 @@ const ManageOrder = () => {
         status: newStatus,
       });
       setOrder((prevOrders) =>
-        prevOrders.map((order) => (order._id === orderId ? { ...order, status: newStatus } : order))
+        prevOrders.map((order) =>
+          order._id === orderId ? { ...order, status: newStatus } : order
+        )
       );
-      toast.success(` ${newStatus}`);
     } catch (error) {
       console.log(error);
-      toast.error("Có lỗi xảy ra khi cập nhật trạng thái!");
     }
   };
 
@@ -108,7 +106,9 @@ const ManageOrder = () => {
               text: "Hủy đơn hàng thành công!",
               icon: "success",
             }).then(() => {
-              setOrder((prevOrders) => prevOrders.filter((order) => order._id !== id));
+              setOrder((prevOrders) =>
+                prevOrders.filter((order) => order._id !== id)
+              );
             });
           }
         });
@@ -116,7 +116,8 @@ const ManageOrder = () => {
     } catch (error) {
       Swal.fire({
         title: "Lỗi!",
-        text: error.response?.data?.message || "Có lỗi xảy ra khi xóa đơn hàng.",
+        text:
+          error.response?.data?.message || "Có lỗi xảy ra khi xóa đơn hàng.",
         icon: "error",
       });
     }
@@ -124,95 +125,113 @@ const ManageOrder = () => {
 
   return (
     <div>
-      <ToastContainer autoClose={3000} />
       <div className="flex min-h-screen border">
         {/* Sidebar */}
         <Sidebar
-          className={`relative border p-3 bg-white ${collapsed ? "collapsed" : "expanded"}`}
-          width={collapsed ? "0px" : "270px"}>
-          <Menu className="bg-white">
-            <div className="flex items-center justify-center mb-6">
-              <img src="./images/logo.png" alt="Logo" />
-            </div>
-            <MenuItem component={<Link to="/admin/dashboard" />}>
-              <div className="flex items-center gap-4">
-                <AiFillDashboard className="w-5 h-5" />
-                Dashboard
-              </div>
-            </MenuItem>
-            <SubMenu label="Quản lý sản phẩm" icon={<FaBook className="w-5 h-5" />}>
-              <MenuItem component={<Link to="/admin/manage-product" />}>
-                Danh sách sản phẩm
-              </MenuItem>
-              <MenuItem component={<Link to="/admin/manage-author" />}>Tác giả</MenuItem>
-              <MenuItem component={<Link to="/admin/manage-publishes" />}>Nhà xuất bản</MenuItem>
-            </SubMenu>
-            <MenuItem component={<Link to="/admin/manage-category" />}>
-              <div className="flex items-center gap-4">
-                <AiOutlineBars className="w-5 h-5" />
-                Quản lý danh mục
-              </div>
-            </MenuItem>
-
-            <MenuItem component={<Link to="/admin/manage-order" />}>
-              <div className="flex items-center gap-4">
-                <FaClipboardList className="w-5 h-5" />
-                Quản lý đơn hàng
-              </div>
-            </MenuItem>
-            <MenuItem component={<Link to="/admin/manage-user" />}>
-              <div className="flex items-center gap-4">
-                <FaUser />
-                Quản lý tài khoản
-              </div>
-            </MenuItem>
-            <MenuItem component={<Link to="/admin/manage-voucher" />}>
-              <div className="flex items-center gap-4">
-                <FaGift />
-                Quản lý voucher
-              </div>
-            </MenuItem>
-            <MenuItem component={<Link to="/admin/manage-blog" />}>
-              <div className="flex items-center gap-4">
-                <FaRegEdit className="w-5 h-5" />
-                Quản lý bài viết
-              </div>
-            </MenuItem>
-            <MenuItem component={<Link to="/admin/manage-contact" />}>
-              <div className="flex items-center gap-4">
-                <MdMarkEmailRead />
-                Quản lý liên hệ
-              </div>
-            </MenuItem>
-            <MenuItem component={<Link to="/admin/stock" />}>
-              <div className="flex items-center gap-4">
-                <MdInventory />
-                Quản lý tồn kho
-              </div>
-            </MenuItem>
-            <MenuItem component={<Link to="/admin/manage-comment" />}>
-              <div className="flex items-center gap-4">
-                <FaCommentAlt />
-                Quản lý bình luận
-              </div>
-            </MenuItem>
-
-            <MenuItem onClick={handleLogout}>
-              <div className="flex items-center gap-4">
-                <MdLogout />
-                Đăng xuất
-              </div>
-            </MenuItem>
-          </Menu>
+          className={`relative border p-3 bg-white ${
+            collapsed ? "collapsed" : "expanded"
+          }`}
+          width={collapsed ? "0px" : "270px"}
+        >
+        <Menu className="bg-white">
+        <div className="flex items-center justify-center mb-6">
+          <img src="./images/logo.png" alt="Logo" />
+        </div>
+        <MenuItem component={<Link to="/admin/dashboard" />}>
+          <div className="flex items-center gap-4">
+            <AiFillDashboard className="w-5 h-5" />
+            Dashboard
+          </div>
+        </MenuItem>
+        <SubMenu
+          label="Quản lý sản phẩm"
+          icon={<FaBook className="w-5 h-5" />}
+        >
+          <MenuItem component={<Link to="/admin/manage-product" />}>
+            Danh sách sản phẩm
+          </MenuItem>
+          <MenuItem component={<Link to="/admin/manage-author" />}>
+            Tác giả
+          </MenuItem>
+          <MenuItem component={<Link to="/admin/manage-publishes" />}>
+            Nhà xuất bản
+          </MenuItem>
+        </SubMenu>
+        <MenuItem component={<Link to="/admin/manage-category" />}>
+          <div className="flex items-center gap-4">
+          <AiOutlineBars className="w-5 h-5" />
+            Quản lý danh mục
+          </div>
+        </MenuItem>
+        
+        <MenuItem component={<Link to="/admin/manage-order" />}>
+          <div className="flex items-center gap-4">
+            <FaClipboardList className="w-5 h-5" />
+            Quản lý đơn hàng
+          </div>
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/manage-user" />}>
+          <div className="flex items-center gap-4">
+            <FaUser />
+            Quản lý tài khoản
+          </div>
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/manage-voucher" />}>
+          <div className="flex items-center gap-4">
+            <FaGift />
+            Quản lý voucher
+          </div>
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/manage-blog" />}>
+          <div className="flex items-center gap-4">
+          <FaRegEdit className="w-5 h-5" />
+            Quản lý bài viết
+          </div>
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/manage-contact" />}>
+          <div className="flex items-center gap-4">
+            <MdMarkEmailRead />
+            Quản lý liên hệ
+          </div>
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/stock" />}>
+          <div className="flex items-center gap-4">
+            <MdInventory />
+            Quản lý tồn kho
+          </div>
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/manage-comment" />}>
+          <div className="flex items-center gap-4">
+            <FaCommentAlt />
+            Quản lý bình luận
+          </div>
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/manage-review" />}>
+          <div className="flex items-center gap-4">
+            <MdOutlinePreview />
+            Quản lý đánh giá
+          </div>
+        </MenuItem>
+        <MenuItem onClick={handleLogout}>
+          <div className="flex items-center gap-4">
+            <MdLogout />
+            Đăng xuất
+          </div>
+        </MenuItem>
+      </Menu>
         </Sidebar>
         {/* Nút toggle nằm bên ngoài Sidebar */}
-        <button onClick={() => setCollapsed(!collapsed)} className="toggle-button">
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="toggle-button"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
-            stroke="currentColor">
+            stroke="currentColor"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -248,7 +267,9 @@ const ManageOrder = () => {
                     <tr key={order._id}>
                       <td>{index + 1}</td>
                       <td>
-                        <Link to={`/admin/detail-order/${order._id}`}>{order.orderId}</Link>
+                        <Link to={`/admin/detail-order/${order._id}`}>
+                          {order.orderId}
+                        </Link>
                       </td>
                       <td>{formattedDate}</td>
                       <td>{order.name}</td>
@@ -269,7 +290,9 @@ const ManageOrder = () => {
                           </button>
                           {order.status === "Chờ xác nhận" && (
                             <button
-                              onClick={() => handleStatusChange(order._id, "Đang xử lý")}
+                              onClick={() =>
+                                handleStatusChange(order._id, "Đang xử lý")
+                              }
                               style={{
                                 padding: "4px 8px",
                                 borderRadius: "4px",
@@ -277,8 +300,13 @@ const ManageOrder = () => {
                                 backgroundColor: "#1E40AF", // bg-blue-600
                                 cursor: "pointer",
                               }}
-                              onMouseOver={(e) => (e.target.style.backgroundColor = "#1D4ED8")} // hover:bg-blue-700
-                              onMouseOut={(e) => (e.target.style.backgroundColor = "#1E40AF")}>
+                              onMouseOver={(e) =>
+                                (e.target.style.backgroundColor = "#1D4ED8")
+                              } // hover:bg-blue-700
+                              onMouseOut={(e) =>
+                                (e.target.style.backgroundColor = "#1E40AF")
+                              }
+                            >
                               <FaCheck
                                 style={{
                                   display: "inline",
@@ -291,7 +319,9 @@ const ManageOrder = () => {
                           )}
                           {order.status === "Đang xử lý" && (
                             <button
-                              onClick={() => handleStatusChange(order._id, "Đang vận chuyển")}
+                              onClick={() =>
+                                handleStatusChange(order._id, "Đang vận chuyển")
+                              }
                               style={{
                                 padding: "4px 8px",
                                 borderRadius: "4px",
@@ -299,8 +329,13 @@ const ManageOrder = () => {
                                 backgroundColor: "#F59E0B", // bg-yellow-500
                                 cursor: "pointer",
                               }}
-                              onMouseOver={(e) => (e.target.style.backgroundColor = "#D97706")} // hover:bg-yellow-600
-                              onMouseOut={(e) => (e.target.style.backgroundColor = "#F59E0B")}>
+                              onMouseOver={(e) =>
+                                (e.target.style.backgroundColor = "#D97706")
+                              } // hover:bg-yellow-600
+                              onMouseOut={(e) =>
+                                (e.target.style.backgroundColor = "#F59E0B")
+                              }
+                            >
                               <FaTruck
                                 style={{
                                   display: "inline",
@@ -313,7 +348,9 @@ const ManageOrder = () => {
                           )}
                           {order.status === "Đang vận chuyển" && (
                             <button
-                              onClick={() => handleStatusChange(order._id, "Giao thành công")}
+                              onClick={() =>
+                                handleStatusChange(order._id, "Giao thành công")
+                              }
                               style={{
                                 padding: "4px 8px",
                                 borderRadius: "4px",
@@ -321,8 +358,13 @@ const ManageOrder = () => {
                                 backgroundColor: "#10B981", // bg-green-600
                                 cursor: "pointer",
                               }}
-                              onMouseOver={(e) => (e.target.style.backgroundColor = "#059669")} // hover:bg-green-700
-                              onMouseOut={(e) => (e.target.style.backgroundColor = "#10B981")}>
+                              onMouseOver={(e) =>
+                                (e.target.style.backgroundColor = "#059669")
+                              } // hover:bg-green-700
+                              onMouseOut={(e) =>
+                                (e.target.style.backgroundColor = "#10B981")
+                              }
+                            >
                               <FaCheckCircle
                                 style={{
                                   display: "inline",
@@ -335,7 +377,9 @@ const ManageOrder = () => {
                           )}
                           {order.status === "Giao thành công" && (
                             <button
-                              onClick={() => handleStatusChange(order._id, "Đã hủy")}
+                              onClick={() =>
+                                handleStatusChange(order._id, "Đã hủy")
+                              }
                               style={{
                                 padding: "4px 8px",
                                 borderRadius: "4px",
@@ -343,8 +387,13 @@ const ManageOrder = () => {
                                 backgroundColor: "#EF4444", // bg-red-600
                                 cursor: "pointer",
                               }}
-                              onMouseOver={(e) => (e.target.style.backgroundColor = "#DC2626")} // hover:bg-red-700
-                              onMouseOut={(e) => (e.target.style.backgroundColor = "#EF4444")}>
+                              onMouseOver={(e) =>
+                                (e.target.style.backgroundColor = "#DC2626")
+                              } // hover:bg-red-700
+                              onMouseOut={(e) =>
+                                (e.target.style.backgroundColor = "#EF4444")
+                              }
+                            >
                               <FaTimesCircle
                                 style={{
                                   display: "inline",
@@ -363,7 +412,8 @@ const ManageOrder = () => {
                                 color: "white",
                                 backgroundColor: "#6B7280", // bg-gray-500
                                 cursor: "not-allowed",
-                              }}>
+                              }}
+                            >
                               <FaTimesCircle
                                 style={{
                                   display: "inline",
@@ -376,7 +426,8 @@ const ManageOrder = () => {
                           )}
                           <button
                             onClick={() => handleDelete(order._id)}
-                            className="bg-red-500 text-white px-2 py-1 rounded">
+                            className="bg-red-500 text-white px-2 py-1 rounded"
+                          >
                             <FaTrashAlt className="w-5 h-4" />
                           </button>
                         </div>

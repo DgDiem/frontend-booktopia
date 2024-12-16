@@ -1,8 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
-import { FaBook, FaClipboardList, FaRegEdit, FaUser, FaGift, FaCommentAlt } from "react-icons/fa";
-import { MdOutlinePreview } from "react-icons/md";
+import {
+  FaBook,
+  FaClipboardList,
+  FaRegEdit,
+  FaUser,
+  FaGift,
+  FaCommentAlt,
+} from "react-icons/fa";
+import { MdOutlinePreview } from 'react-icons/md';
 import { MdLogout } from "react-icons/md";
 import { AiFillDashboard, AiOutlineBars } from "react-icons/ai";
 import { MdMarkEmailRead } from "react-icons/md";
@@ -101,89 +108,110 @@ const EditVoucher = () => {
   return (
     <div className="flex min-h-screen border">
       <Sidebar
-        className={`relative border p-3 bg-white ${collapsed ? "collapsed" : "expanded"}`}
-        width={collapsed ? "0px" : "270px"}>
-        <Menu className="bg-white">
-          <div className="flex items-center justify-center mb-6">
-            <img src="./images/logo.png" alt="Logo" />
-          </div>
-          <MenuItem component={<Link to="/admin/dashboard" />}>
-            <div className="flex items-center gap-4">
-              <AiFillDashboard className="w-5 h-5" />
-              Dashboard
-            </div>
-          </MenuItem>
-          <SubMenu label="Quản lý sản phẩm" icon={<FaBook className="w-5 h-5" />}>
-            <MenuItem component={<Link to="/admin/manage-product" />}>Danh sách sản phẩm</MenuItem>
-            <MenuItem component={<Link to="/admin/manage-author" />}>Tác giả</MenuItem>
-            <MenuItem component={<Link to="/admin/manage-publishes" />}>Nhà xuất bản</MenuItem>
-          </SubMenu>
-          <MenuItem component={<Link to="/admin/manage-category" />}>
-            <div className="flex items-center gap-4">
-              <AiOutlineBars className="w-5 h-5" />
-              Quản lý danh mục
-            </div>
-          </MenuItem>
-
-          <MenuItem component={<Link to="/admin/manage-order" />}>
-            <div className="flex items-center gap-4">
-              <FaClipboardList className="w-5 h-5" />
-              Quản lý đơn hàng
-            </div>
-          </MenuItem>
-          <MenuItem component={<Link to="/admin/manage-user" />}>
-            <div className="flex items-center gap-4">
-              <FaUser />
-              Quản lý tài khoản
-            </div>
-          </MenuItem>
-          <MenuItem component={<Link to="/admin/manage-voucher" />}>
-            <div className="flex items-center gap-4">
-              <FaGift />
-              Quản lý voucher
-            </div>
-          </MenuItem>
-          <MenuItem component={<Link to="/admin/manage-blog" />}>
-            <div className="flex items-center gap-4">
-              <FaRegEdit className="w-5 h-5" />
-              Quản lý bài viết
-            </div>
-          </MenuItem>
-          <MenuItem component={<Link to="/admin/manage-contact" />}>
-            <div className="flex items-center gap-4">
-              <MdMarkEmailRead />
-              Quản lý liên hệ
-            </div>
-          </MenuItem>
-          <MenuItem component={<Link to="/admin/stock" />}>
-            <div className="flex items-center gap-4">
-              <MdInventory />
-              Quản lý tồn kho
-            </div>
-          </MenuItem>
-          <MenuItem component={<Link to="/admin/manage-comment" />}>
-            <div className="flex items-center gap-4">
-              <FaCommentAlt />
-              Quản lý bình luận
-            </div>
-          </MenuItem>
-
-          <MenuItem onClick={handleLogout}>
-            <div className="flex items-center gap-4">
-              <MdLogout />
-              Đăng xuất
-            </div>
-          </MenuItem>
-        </Menu>
+        className={`relative border p-3 bg-white ${
+          collapsed ? "collapsed" : "expanded"
+        }`}
+        width={collapsed ? "0px" : "270px"}
+      >
+      <Menu className="bg-white">
+      <div className="flex items-center justify-center mb-6">
+        <img src="./images/logo.png" alt="Logo" />
+      </div>
+      <MenuItem component={<Link to="/admin/dashboard" />}>
+        <div className="flex items-center gap-4">
+          <AiFillDashboard className="w-5 h-5" />
+          Dashboard
+        </div>
+      </MenuItem>
+      <SubMenu
+        label="Quản lý sản phẩm"
+        icon={<FaBook className="w-5 h-5" />}
+      >
+        <MenuItem component={<Link to="/admin/manage-product" />}>
+          Danh sách sản phẩm
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/manage-author" />}>
+          Tác giả
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/manage-publishes" />}>
+          Nhà xuất bản
+        </MenuItem>
+      </SubMenu>
+      <MenuItem component={<Link to="/admin/manage-category" />}>
+        <div className="flex items-center gap-4">
+        <AiOutlineBars className="w-5 h-5" />
+          Quản lý danh mục
+        </div>
+      </MenuItem>
+      
+      <MenuItem component={<Link to="/admin/manage-order" />}>
+        <div className="flex items-center gap-4">
+          <FaClipboardList className="w-5 h-5" />
+          Quản lý đơn hàng
+        </div>
+      </MenuItem>
+      <MenuItem component={<Link to="/admin/manage-user" />}>
+        <div className="flex items-center gap-4">
+          <FaUser />
+          Quản lý tài khoản
+        </div>
+      </MenuItem>
+      <MenuItem component={<Link to="/admin/manage-voucher" />}>
+        <div className="flex items-center gap-4">
+          <FaGift />
+          Quản lý voucher
+        </div>
+      </MenuItem>
+      <MenuItem component={<Link to="/admin/manage-blog" />}>
+        <div className="flex items-center gap-4">
+        <FaRegEdit className="w-5 h-5" />
+          Quản lý bài viết
+        </div>
+      </MenuItem>
+      <MenuItem component={<Link to="/admin/manage-contact" />}>
+        <div className="flex items-center gap-4">
+          <MdMarkEmailRead />
+          Quản lý liên hệ
+        </div>
+      </MenuItem>
+      <MenuItem component={<Link to="/admin/stock" />}>
+        <div className="flex items-center gap-4">
+          <MdInventory />
+          Quản lý tồn kho
+        </div>
+      </MenuItem>
+      <MenuItem component={<Link to="/admin/manage-comment" />}>
+        <div className="flex items-center gap-4">
+          <FaCommentAlt />
+          Quản lý bình luận
+        </div>
+      </MenuItem>
+      <MenuItem component={<Link to="/admin/manage-review" />}>
+        <div className="flex items-center gap-4">
+          <MdOutlinePreview />
+          Quản lý đánh giá
+        </div>
+      </MenuItem>
+      <MenuItem onClick={handleLogout}>
+        <div className="flex items-center gap-4">
+          <MdLogout />
+          Đăng xuất
+        </div>
+      </MenuItem>
+    </Menu>
       </Sidebar>
       {/* Nút toggle nằm bên ngoài Sidebar */}
-      <button onClick={() => setCollapsed(!collapsed)} className="toggle-button">
+      <button
+        onClick={() => setCollapsed(!collapsed)}
+        className="toggle-button"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
           strokeWidth={1.5}
-          stroke="currentColor">
+          stroke="currentColor"
+        >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -197,15 +225,25 @@ const EditVoucher = () => {
           <PageTitle title="Cập nhật voucher" className="text-mainDark" />
         </div>
         <div className="border rounded-[10px] py-8 px-5 mt-7">
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col gap-6"
+          >
             <div className="flex items-center gap-12">
               <div className="w-2/4 flex flex-col gap-3">
                 <label htmlFor="code">*Mã voucher</label>
-                <input type="text" {...register("code")} className="input input-bordered w-full" />
+                <input
+                  type="text"
+                  {...register("code")}
+                  className="input input-bordered w-full"
+                />
               </div>
               <div className="w-2/4 flex flex-col gap-3">
                 <label htmlFor="type">*Loại voucher</label>
-                <select {...register("type")} className="input input-bordered w-full">
+                <select
+                  {...register("type")}
+                  className="input input-bordered w-full"
+                >
                   <option value="Discount">Discount</option>
                   <option value="Shipping">Shipping</option>
                 </select>
@@ -250,7 +288,8 @@ const EditVoucher = () => {
               <textarea
                 {...register("description")}
                 className="textarea textarea-bordered"
-                placeholder="Nhập mô tả"></textarea>
+                placeholder="Nhập mô tả"
+              ></textarea>
             </div>
             <div className="flex items-center gap-3">
               <Button type="submit">Cập nhật</Button>
