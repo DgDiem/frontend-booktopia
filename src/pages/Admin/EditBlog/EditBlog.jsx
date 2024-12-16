@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
-import { FaBook, FaClipboardList, FaRegEdit, FaUser, FaGift } from "react-icons/fa";
-import { MdLogout } from "react-icons/md";
+import { FaBook, FaClipboardList, FaRegEdit, FaUser, FaGift, FaCommentAlt } from "react-icons/fa";
+import { MdLogout, MdOutlinePreview } from "react-icons/md";
 import { AiFillDashboard, AiOutlineBars } from "react-icons/ai";
 import { MdMarkEmailRead } from "react-icons/md";
 import { MdInventory } from "react-icons/md";
@@ -14,16 +14,31 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { URL_API } from "../../../constants/constants.js";
 import { showSwalFireSuccess } from "../../../helpers/helpers";
-
+import Cookies from "js-cookie";
 const EditBlog = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
-  const handleLogout = () => {
-    navigate("/");
-  };
+  const [user, setUser] = useState({});
+  // Lấy dữ liệu người dùng từ cookie
+  useEffect(() => {
+    const userData = Cookies.get("user");
+    if (userData) {
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser.user);
+    }
+  }, []);
 
+  // Đăng xuất xóa cookie người dùng
+  const handleLogout = () => {
+    // Xử lý logout, ví dụ xóa cookie và chuyển hướng người dùng
+    Cookies.remove("user");
+    setUser(null);
+    // Chuyển hướng hoặc cập nhật state để hiển thị UI phù hợp
+    navigate("/sign-in");
+    window.location.reload();
+  };
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -81,7 +96,9 @@ const EditBlog = () => {
       });
     }
   };
-
+  const handleCancel = () => {
+    navigate("/admin/manage-blog");
+  };
   return (
     <div>
       <div className="flex min-h-screen border">
@@ -98,12 +115,6 @@ const EditBlog = () => {
                 Dashboard
               </div>
             </MenuItem>
-
-            <SubMenu label="Quản lý danh mục" icon={<AiOutlineBars className="w-5 h-5" />}>
-              <MenuItem component={<Link to="/admin/manage-category" />}>
-                Danh sách danh mục
-              </MenuItem>
-            </SubMenu>
             <SubMenu label="Quản lý sản phẩm" icon={<FaBook className="w-5 h-5" />}>
               <MenuItem component={<Link to="/admin/manage-product" />}>
                 Danh sách sản phẩm
@@ -111,7 +122,14 @@ const EditBlog = () => {
               <MenuItem component={<Link to="/admin/manage-author" />}>Tác giả</MenuItem>
               <MenuItem component={<Link to="/admin/manage-publishes" />}>Nhà xuất bản</MenuItem>
             </SubMenu>
-            <MenuItem component={<Link to="/admin/manage-items" />}>
+            <MenuItem component={<Link to="/admin/manage-category" />}>
+              <div className="flex items-center gap-4">
+                <AiOutlineBars className="w-5 h-5" />
+                Quản lý danh mục
+              </div>
+            </MenuItem>
+
+            <MenuItem component={<Link to="/admin/manage-order" />}>
               <div className="flex items-center gap-4">
                 <FaClipboardList className="w-5 h-5" />
                 Quản lý đơn hàng
@@ -129,9 +147,12 @@ const EditBlog = () => {
                 Quản lý voucher
               </div>
             </MenuItem>
-            <SubMenu label="Quản lý bài viết" icon={<FaRegEdit className="w-5 h-5" />}>
-              <MenuItem component={<Link to="/admin/manage-blog" />}>Danh sách bài viết</MenuItem>
-            </SubMenu>
+            <MenuItem component={<Link to="/admin/manage-blog" />}>
+              <div className="flex items-center gap-4">
+                <FaRegEdit className="w-5 h-5" />
+                Quản lý bài viết
+              </div>
+            </MenuItem>
             <MenuItem component={<Link to="/admin/manage-contact" />}>
               <div className="flex items-center gap-4">
                 <MdMarkEmailRead />
@@ -140,10 +161,17 @@ const EditBlog = () => {
             </MenuItem>
             <MenuItem component={<Link to="/admin/stock" />}>
               <div className="flex items-center gap-4">
-              <MdInventory />
+                <MdInventory />
                 Quản lý tồn kho
               </div>
             </MenuItem>
+            <MenuItem component={<Link to="/admin/manage-comment" />}>
+              <div className="flex items-center gap-4">
+                <FaCommentAlt />
+                Quản lý bình luận
+              </div>
+            </MenuItem>
+
             <MenuItem onClick={handleLogout}>
               <div className="flex items-center gap-4">
                 <MdLogout />
@@ -182,7 +210,7 @@ const EditBlog = () => {
                   id="name"
                   className="input input-bordered w-full"
                 />
-                {errors.name && <p className="text-red-500">Tên bài viết là bắt buộc</p>}
+                {errors.name && <p className="text-red">Tên bài viết là bắt buộc</p>}
               </div>
               <div className="w-full flex flex-col gap-2">
                 <label htmlFor="date">*Ngày viết</label>
@@ -192,7 +220,7 @@ const EditBlog = () => {
                   id="date"
                   className="input input-bordered w-full"
                 />
-                {errors.date && <p className="text-red-500">Ngày viết là bắt buộc</p>}
+                {errors.date && <p className="text-red">Ngày viết là bắt buộc</p>}
               </div>
               <div className="w-full flex flex-col gap-2">
                 <label htmlFor="image">*Hình ảnh</label>
@@ -210,7 +238,7 @@ const EditBlog = () => {
                   className="file-input file-input-bordered w-full"
                   onChange={handleImageChange}
                 />
-                {errors.image && <p className="text-red-500">Hình ảnh là bắt buộc</p>}
+                {errors.image && <p className="text-red">Hình ảnh là bắt buộc</p>}
               </div>
               <div className="w-full flex flex-col gap-2">
                 <label htmlFor="content">Nội dung</label>
@@ -219,11 +247,13 @@ const EditBlog = () => {
                   id="content"
                   className="input input-bordered w-full h-32"
                 />
-                {errors.content && <p className="text-red-500">Nội dung là bắt buộc</p>}
+                {errors.content && <p className="text-red">Nội dung là bắt buộc</p>}
               </div>
               <div className="flex items-center gap-3">
                 <Button>Lưu</Button>
-                <Button className="bg-secondary">Hủy</Button>
+                <Button className="bg-secondary" onClick={handleCancel}>
+                  Hủy
+                </Button>
               </div>
             </form>
           </div>

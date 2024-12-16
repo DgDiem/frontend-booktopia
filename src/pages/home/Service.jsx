@@ -36,7 +36,8 @@ const Service = () => {
             {serviceList.map((item) => (
               <div
                 className="flex items-center gap-3 max-lg:justify-center max-sm:flex-col max-sm:justify-center max-sm::items-center"
-                key={item.id}>
+                key={item.id}
+              >
                 {item.icon}
                 <div className="flex flex-col">
                   <div className="font-semibold leading-normal max-sm:text-center max-sm:text-sm">

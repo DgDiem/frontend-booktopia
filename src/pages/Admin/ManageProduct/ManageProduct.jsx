@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import {
   FaBook,
@@ -10,8 +10,11 @@ import {
   FaUser,
   FaUserEdit,
   FaGift,
+  FaCommentAlt,
+  FaToggleOff,
+  FaToggleOn,
 } from "react-icons/fa";
-import { MdLogout } from "react-icons/md";
+import { MdLogout, MdOutlinePreview } from "react-icons/md";
 import { AiFillDashboard, AiOutlineBars } from "react-icons/ai";
 import { MdMarkEmailRead } from "react-icons/md";
 import { MdInventory } from "react-icons/md";
@@ -20,33 +23,65 @@ import HeaderAdmin from "../../../components/HeaderAdmin/HeaderAdmin";
 import axios from "axios";
 import { URL_API } from "../../../constants/constants";
 import { showSwalFireDelete } from "../../../helpers/helpers";
-
+import ReactPaginate from "react-paginate"; // Import thư viện React Paginate
+import Cookies from "js-cookie";
+import Swal from "sweetalert2";
 const ManageProduct = () => {
+  const location = useLocation();
   const isAdmin = true;
+  const [searchTerm, setSearchTerm] = useState(
+    new URLSearchParams(location.search).get("search") || ""
+  );
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
+  const [user, setUser] = useState({});
+
+  // Phân trang
+  const [currentPage, setCurrentPage] = useState(0);
+  const [productsPerPage] = useState(10); // Số sản phẩm hiển thị trên mỗi trang
+  const [pageCount, setPageCount] = useState(0);
+  // Lấy dữ liệu người dùng từ cookie
+  useEffect(() => {
+    const userData = Cookies.get("user");
+    if (userData) {
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser.user);
+    }
+  }, []);
+
+  // Đăng xuất xóa cookie người dùng
   const handleLogout = () => {
-    // Perform logout operations here (e.g., clearing authentication tokens)
-    // Then navigate to the home page
-    navigate("/");
+    // Xử lý logout, ví dụ xóa cookie và chuyển hướng người dùng
+    Cookies.remove("user");
+    setUser(null);
+    // Chuyển hướng hoặc cập nhật state để hiển thị UI phù hợp
+    navigate("/sign-in");
+    window.location.reload();
   };
 
-  const [allProductList, setAllProductList] = useState([]);
-
   useEffect(() => {
-    const fetchProductList = async () => {
+    const fetchProducts = async () => {
+      setLoading(true);
       try {
-        const response = await axios.get(`${URL_API}/products`);
-        const data = response.data;
-        setAllProductList(data);
-        console.log(data);
+        const url = searchTerm.trim()
+          ? `${URL_API}/products/search/${searchTerm.trim()}`
+          : `${URL_API}/products`;
+        const response = await axios.get(url);
+        setProducts(response.data);
+
+        // Cập nhật tổng số trang
+        setPageCount(Math.ceil(response.data.length / productsPerPage));
       } catch (error) {
-        console.log(error);
-        setAllProductList([]); // Đặt mảng rỗng trong trường hợp lỗi
+        console.error("Lỗi khi tìm kiếm sản phẩm", error);
+      } finally {
+        setLoading(false);
       }
     };
-    fetchProductList();
-  }, []);
+
+    fetchProducts();
+  }, [searchTerm, location.search]);
 
   const handleDelete = async (id) => {
     try {
@@ -57,16 +92,51 @@ const ManageProduct = () => {
     }
   };
 
+  // Hàm xử lý khi chuyển trang
+  const handlePageClick = (event) => {
+    setCurrentPage(event.selected);
+  };
+
+  // Lấy danh sách sản phẩm cho trang hiện tại
+  const offset = currentPage * productsPerPage;
+  const currentProducts = products.slice(offset, offset + productsPerPage);
+
+  const handleUpdateStatus = async (id, currentStatus) => {
+    try {
+      const updatedStatus = !currentStatus;
+      await axios.put(`${URL_API}/products/${id}/status`, {
+        isActive: updatedStatus,
+      });
+
+      // Cập nhật trạng thái trong UI sau khi thành công
+      const updatedProducts = products.map((product) =>
+        product._id === id ? { ...product, isActive: updatedStatus } : product
+      );
+      setProducts(updatedProducts);
+
+      // Hiển thị thông báo thành công bằng Swal
+      Swal.fire({
+        icon: "success",
+        title: "Cập nhật trạng thái thành công!",
+        text: `Sản phẩm đã được ${updatedStatus ? "kích hoạt" : "ẩn"} thành công.`,
+      });
+    } catch (error) {
+      console.error("Lỗi khi cập nhật trạng thái sản phẩm", error);
+      Swal.fire({
+        icon: "error",
+        title: "Cập nhật trạng thái thất bại!",
+        text: "Đã có lỗi xảy ra khi cập nhật trạng thái sản phẩm.",
+      });
+    }
+  };
+
   return (
     <div>
       <div className="flex min-h-screen border">
         {/* Sidebar */}
         <Sidebar
-          className={`relative border p-3 bg-white ${
-            collapsed ? "collapsed" : "expanded"
-          }`}
-          width={collapsed ? "0px" : "270px"}
-        >
+          className={`relative border p-3 bg-white ${collapsed ? "collapsed" : "expanded"}`}
+          width={collapsed ? "0px" : "270px"}>
           <Menu className="bg-white">
             <div className="flex items-center justify-center mb-6">
               <img src="./images/logo.png" alt="Logo" />
@@ -77,29 +147,20 @@ const ManageProduct = () => {
                 Dashboard
               </div>
             </MenuItem>
-
-            <SubMenu
-              label="Quản lý danh mục"
-              icon={<AiOutlineBars className="w-5 h-5" />}
-            >
-              <MenuItem component={<Link to="/admin/manage-category" />}>
-                Danh sách danh mục
-              </MenuItem>
-            </SubMenu>
-            <SubMenu
-              label="Quản lý sản phẩm"
-              icon={<FaBook className="w-5 h-5" />}
-            >
+            <SubMenu label="Quản lý sản phẩm" icon={<FaBook className="w-5 h-5" />}>
               <MenuItem component={<Link to="/admin/manage-product" />}>
                 Danh sách sản phẩm
               </MenuItem>
-              <MenuItem component={<Link to="/admin/manage-author" />}>
-                Tác giả
-              </MenuItem>
-              <MenuItem component={<Link to="/admin/manage-publishes" />}>
-                Nhà xuất bản
-              </MenuItem>
+              <MenuItem component={<Link to="/admin/manage-author" />}>Tác giả</MenuItem>
+              <MenuItem component={<Link to="/admin/manage-publishes" />}>Nhà xuất bản</MenuItem>
             </SubMenu>
+            <MenuItem component={<Link to="/admin/manage-category" />}>
+              <div className="flex items-center gap-4">
+                <AiOutlineBars className="w-5 h-5" />
+                Quản lý danh mục
+              </div>
+            </MenuItem>
+
             <MenuItem component={<Link to="/admin/manage-order" />}>
               <div className="flex items-center gap-4">
                 <FaClipboardList className="w-5 h-5" />
@@ -118,14 +179,12 @@ const ManageProduct = () => {
                 Quản lý voucher
               </div>
             </MenuItem>
-            <SubMenu
-              label="Quản lý bài viết"
-              icon={<FaRegEdit className="w-5 h-5" />}
-            >
-              <MenuItem component={<Link to="/admin/manage-blog" />}>
-                Danh sách bài viết
-              </MenuItem>
-            </SubMenu>
+            <MenuItem component={<Link to="/admin/manage-blog" />}>
+              <div className="flex items-center gap-4">
+                <FaRegEdit className="w-5 h-5" />
+                Quản lý bài viết
+              </div>
+            </MenuItem>
             <MenuItem component={<Link to="/admin/manage-contact" />}>
               <div className="flex items-center gap-4">
                 <MdMarkEmailRead />
@@ -138,6 +197,13 @@ const ManageProduct = () => {
                 Quản lý tồn kho
               </div>
             </MenuItem>
+            <MenuItem component={<Link to="/admin/manage-comment" />}>
+              <div className="flex items-center gap-4">
+                <FaCommentAlt />
+                Quản lý bình luận
+              </div>
+            </MenuItem>
+
             <MenuItem onClick={handleLogout}>
               <div className="flex items-center gap-4">
                 <MdLogout />
@@ -147,17 +213,13 @@ const ManageProduct = () => {
           </Menu>
         </Sidebar>
         {/* Nút toggle nằm bên ngoài Sidebar */}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="toggle-button"
-        >
+        <button onClick={() => setCollapsed(!collapsed)} className="toggle-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
-            stroke="currentColor"
-          >
+            stroke="currentColor">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -190,13 +252,14 @@ const ManageProduct = () => {
                   <th>Nhà xuất bản</th>
                   <th className="text-center">Giá</th>
                   <th>Số lượng</th>
+                  <th className="text-center">Trạng thái</th>
                   <th className="text-center">Thao tác</th>
                 </tr>
               </thead>
               <tbody>
-                {allProductList.map((item, index) => (
-                  <tr key={item._id}>
-                    <td>{index + 1}</td>
+                {currentProducts.map((item, index) => (
+                  <tr key={item._id} item={item}>
+                    <td>{offset + index + 1}</td> {/* Hiển thị STT chính xác */}
                     <td>
                       <img
                         src={`${URL_API}/images/${item.image1}`}
@@ -227,18 +290,56 @@ const ManageProduct = () => {
                     <td className="px-3 text-center">{item.quantity}</td>
                     <td>
                       <div className="flex items-center justify-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateStatus(item._id, item.isActive)}
+                          className="w-28 text-[12px] justify-items-center p-2 rounded-lg text-white cursor-pointer flex items-center justify-center gap-2"
+                          style={{
+                            backgroundColor: item.isActive ? "#166534" : "#ef4444",
+                          }}>
+                          {item.isActive ? "Đang hoạt động" : "Ngưng hoạt động"}
+                        </button>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="flex items-center justify-center gap-3">
                         <Link to={`/admin/edit-product/${item._id}`}>
                           <FaUserEdit className="w-5 h-5 text-main" />
                         </Link>
-                        <button onClick={(e) => handleDelete(item._id)}>
+                        {/* <button onClick={(e) => handleDelete(item._id)}>
                           <FaTrashAlt className="w-5 h-4 text-red" />
-                        </button>
+                        </button> */}
                       </div>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            {/* Phân trang */}
+            <ReactPaginate
+              previousLabel={"Trước"}
+              nextLabel={"Sau"}
+              breakLabel={<span className="px-3 py-2 leading-tight text-gray-500">...</span>} // Thêm style cho breakLabel
+              pageCount={pageCount}
+              marginPagesDisplayed={1} //xác định số lượng nút số trang hiển thị ở đầu và cuối danh sách phân trang
+              pageRangeDisplayed={3} //xác định số lượng nút số trang hiển thị xung quanh trang hiện tại.
+              onPageChange={handlePageClick}
+              containerClassName={"flex justify-center items-center"} // Thêm class items-center
+              pageClassName={
+                "px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+              }
+              previousLinkClassName={
+                "px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 rounded-l-lg"
+              }
+              nextLinkClassName={
+                "px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 rounded-r-lg"
+              }
+              disabledClassName={"opacity-50 cursor-not-allowed"}
+              activeClassName={
+                "px-3 py-2 text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700"
+              }
+              forcePage={currentPage} // Giữ trạng thái trang hiện tại
+            />
           </div>
         </div>
       </div>

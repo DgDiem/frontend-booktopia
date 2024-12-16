@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
-import { FaBook, FaClipboardList, FaRegEdit, FaUser, FaGift } from "react-icons/fa";
-import { MdLogout } from "react-icons/md";
+import { FaBook, FaClipboardList, FaRegEdit, FaUser, FaGift, FaCommentAlt } from "react-icons/fa";
+import { MdInventory, MdLogout, MdOutlinePreview } from "react-icons/md";
 import { AiFillDashboard, AiOutlineBars } from "react-icons/ai";
 import { MdMarkEmailRead } from "react-icons/md";
 
@@ -13,13 +13,28 @@ import { URL_API } from "../../../constants/constants";
 import { showSwalFireSuccess } from "../../../helpers/helpers";
 import HeaderAdmin from "../../../components/HeaderAdmin/HeaderAdmin";
 import PageTitle from "../../../components/PageTitle/PageTitle";
-
+import Cookies from "js-cookie";
 const AddAuthor = () => {
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
+  const [user, setUser] = useState({});
+  // Lấy dữ liệu người dùng từ cookie
+  useEffect(() => {
+    const userData = Cookies.get("user");
+    if (userData) {
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser.user);
+    }
+  }, []);
 
+  // Đăng xuất xóa cookie người dùng
   const handleLogout = () => {
-    navigate("/");
+    // Xử lý logout, ví dụ xóa cookie và chuyển hướng người dùng
+    Cookies.remove("user");
+    setUser(null);
+    // Chuyển hướng hoặc cập nhật state để hiển thị UI phù hợp
+    navigate("/sign-in");
+    window.location.reload();
   };
   const {
     register,
@@ -39,7 +54,9 @@ const AddAuthor = () => {
       console.error("Error creating product:", error);
     }
   };
-
+  const handleCancel = () => {
+    navigate("/admin/manage-author");
+  };
   return (
     <div>
       <div className="flex min-h-screen border">
@@ -56,12 +73,6 @@ const AddAuthor = () => {
                 Dashboard
               </div>
             </MenuItem>
-
-            <SubMenu label="Quản lý danh mục" icon={<AiOutlineBars className="w-5 h-5" />}>
-              <MenuItem component={<Link to="/admin/manage-category" />}>
-                Danh sách danh mục
-              </MenuItem>
-            </SubMenu>
             <SubMenu label="Quản lý sản phẩm" icon={<FaBook className="w-5 h-5" />}>
               <MenuItem component={<Link to="/admin/manage-product" />}>
                 Danh sách sản phẩm
@@ -69,6 +80,13 @@ const AddAuthor = () => {
               <MenuItem component={<Link to="/admin/manage-author" />}>Tác giả</MenuItem>
               <MenuItem component={<Link to="/admin/manage-publishes" />}>Nhà xuất bản</MenuItem>
             </SubMenu>
+            <MenuItem component={<Link to="/admin/manage-category" />}>
+              <div className="flex items-center gap-4">
+                <AiOutlineBars className="w-5 h-5" />
+                Quản lý danh mục
+              </div>
+            </MenuItem>
+
             <MenuItem component={<Link to="/admin/manage-order" />}>
               <div className="flex items-center gap-4">
                 <FaClipboardList className="w-5 h-5" />
@@ -87,21 +105,31 @@ const AddAuthor = () => {
                 Quản lý voucher
               </div>
             </MenuItem>
-            <SubMenu label="Quản lý bài viết" icon={<FaRegEdit className="w-5 h-5" />}>
-              <MenuItem component={<Link to="/admin/manage-blog" />}>Danh sách bài viết</MenuItem>
-            </SubMenu>
+            <MenuItem component={<Link to="/admin/manage-blog" />}>
+              <div className="flex items-center gap-4">
+                <FaRegEdit className="w-5 h-5" />
+                Quản lý bài viết
+              </div>
+            </MenuItem>
             <MenuItem component={<Link to="/admin/manage-contact" />}>
               <div className="flex items-center gap-4">
-              <MdInventory />
+                <MdMarkEmailRead />
                 Quản lý liên hệ
               </div>
             </MenuItem>
             <MenuItem component={<Link to="/admin/stock" />}>
               <div className="flex items-center gap-4">
-                <MdMarkEmailRead />
+                <MdInventory />
                 Quản lý tồn kho
               </div>
             </MenuItem>
+            <MenuItem component={<Link to="/admin/manage-comment" />}>
+              <div className="flex items-center gap-4">
+                <FaCommentAlt />
+                Quản lý bình luận
+              </div>
+            </MenuItem>
+
             <MenuItem onClick={handleLogout}>
               <div className="flex items-center gap-4">
                 <MdLogout />
@@ -140,12 +168,14 @@ const AddAuthor = () => {
                   id="name"
                   className="input input-bordered w-full"
                 />
-                {errors.name && <span className="text-red">Product Name is required</span>}
+                {errors.name && <span className="text-red">Tác giả là bắt buộc</span>}
               </div>
 
               <div className="flex items-center gap-3">
                 <Button>Lưu</Button>
-                <Button className="bg-secondary">Hủy</Button>
+                <Button className="bg-secondary" onClick={handleCancel}>
+                  Hủy
+                </Button>
               </div>
             </form>
           </div>

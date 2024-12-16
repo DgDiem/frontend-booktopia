@@ -60,6 +60,7 @@ const SignInPage = () => {
         email: user.email,
         displayName: user.displayName,
         photoURL: user.photoURL || "./images/avatar.png", // Dùng ảnh mặc định nếu không có ảnh từ Google
+        role: -2,
       };
 
       // Lưu thông tin người dùng vào cookie
@@ -157,7 +158,7 @@ const SignInPage = () => {
                   <div className="text-red mt-1 text-sm">{errors.password.message}</div>
                 )}
               </div>
-              <div className="text-right text-sm font-normal leading-normal">Quên mật khẩu?</div>
+
               <div>
                 <Button
                   type="submit"
@@ -168,10 +169,6 @@ const SignInPage = () => {
               </div>
               <div className="text-center">Hoặc đăng nhập bằng</div>
               <div className="flex items-center gap-5">
-                <div className="bg-blue w-full rounded-[10px] py-4 px-10 text-white h-10 flex items-center gap-2 justify-center cursor-pointer">
-                  <FaFacebookF className="w-5 h-5"></FaFacebookF>
-                  Facebook
-                </div>
                 <div
                   onClick={signUpWithGoogle}
                   className="bg-btnGoogle w-full rounded-[10px] py-3 px-10 text-white h-10 flex items-center gap-2 justify-center cursor-pointer">

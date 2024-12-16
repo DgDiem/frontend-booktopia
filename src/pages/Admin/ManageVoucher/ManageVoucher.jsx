@@ -4,6 +4,7 @@ import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import {
   FaBook,
   FaClipboardList,
+  FaCommentAlt,
   FaGift,
   FaPlus,
   FaRegEdit,
@@ -11,7 +12,7 @@ import {
   FaUser,
   FaUserEdit,
 } from "react-icons/fa";
-import { MdLogout } from "react-icons/md";
+import { MdLogout, MdOutlinePreview } from "react-icons/md";
 import { AiFillDashboard, AiOutlineBars } from "react-icons/ai";
 import PageTitle from "../../../components/PageTitle/PageTitle";
 import HeaderAdmin from "../../../components/HeaderAdmin/HeaderAdmin";
@@ -20,12 +21,29 @@ import { URL_API } from "../../../constants/constants";
 import Swal from "sweetalert2";
 import { MdMarkEmailRead } from "react-icons/md";
 import { MdInventory } from "react-icons/md";
+import Cookies from "js-cookie";
 const ManageVoucher = () => {
   const isAdmin = true;
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
+  const [user, setUser] = useState({});
+  // Lấy dữ liệu người dùng từ cookie
+  useEffect(() => {
+    const userData = Cookies.get("user");
+    if (userData) {
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser.user);
+    }
+  }, []);
+
+  // Đăng xuất xóa cookie người dùng
   const handleLogout = () => {
-    navigate("/");
+    // Xử lý logout, ví dụ xóa cookie và chuyển hướng người dùng
+    Cookies.remove("user");
+    setUser(null);
+    // Chuyển hướng hoặc cập nhật state để hiển thị UI phù hợp
+    navigate("/sign-in");
+    window.location.reload();
   };
   const [lstVoucher, setLstVoucher] = useState([]);
   useEffect(() => {
@@ -33,7 +51,7 @@ const ManageVoucher = () => {
   }, []);
   const fetchVoucher = async () => {
     try {
-      const response = await axios.get(`${URL_API}/vouchers`);
+      const response = await axios.get(`${URL_API}/vouchers/admin`);
       const data = response.data;
       setLstVoucher(data);
     } catch (error) {
@@ -44,7 +62,6 @@ const ManageVoucher = () => {
   const handleDelete = async (id) => {
     try {
       const response = await axios.delete(`${URL_API}/vouchers/${id}`);
-
       if (response.status === 200) {
         Swal.fire({
           title: "Bạn có muốn xóa?",
@@ -74,7 +91,42 @@ const ManageVoucher = () => {
       });
     }
   };
+  const handleUpdateStatus = async (id, currentStatus) => {
+    try {
+      const updatedStatus = !currentStatus;
+      const response = await axios.put(`${URL_API}/vouchers/${id}/status`, {
+        isActive: updatedStatus,
+      });
 
+      if (response.status === 200) {
+        const updateVouchers = lstVoucher.map((item) =>
+          item._id === id ? { ...item, isActive: updatedStatus } : item
+        );
+        setLstVoucher(updateVouchers);
+
+        // Hiển thị thông báo thành công bằng Swal
+        Swal.fire({
+          icon: "success",
+          title: "Cập nhật trạng thái thành công!",
+          text: `Voucher đã được ${updatedStatus ? "kích hoạt" : "ẩn"} thành công.`,
+        });
+      } else {
+        // Nếu status không phải 200, hiển thị thông báo lỗi
+        Swal.fire({
+          icon: "error",
+          title: "Cập nhật trạng thái thất bại!",
+          text: "Đã có lỗi xảy ra khi cập nhật trạng thái Voucher.",
+        });
+      }
+    } catch (error) {
+      console.error("Lỗi khi cập nhật trạng thái Voucher", error);
+      Swal.fire({
+        icon: "error",
+        title: "Cập nhật trạng thái thất bại!",
+        text: "Đã có lỗi xảy ra khi cập nhật trạng thái bài viết.",
+      });
+    }
+  };
   return (
     <div>
       <div className="flex min-h-screen border">
@@ -92,12 +144,6 @@ const ManageVoucher = () => {
                 Dashboard
               </div>
             </MenuItem>
-
-            <SubMenu label="Quản lý danh mục" icon={<AiOutlineBars className="w-5 h-5" />}>
-              <MenuItem component={<Link to="/admin/manage-category" />}>
-                Danh sách danh mục
-              </MenuItem>
-            </SubMenu>
             <SubMenu label="Quản lý sản phẩm" icon={<FaBook className="w-5 h-5" />}>
               <MenuItem component={<Link to="/admin/manage-product" />}>
                 Danh sách sản phẩm
@@ -105,6 +151,13 @@ const ManageVoucher = () => {
               <MenuItem component={<Link to="/admin/manage-author" />}>Tác giả</MenuItem>
               <MenuItem component={<Link to="/admin/manage-publishes" />}>Nhà xuất bản</MenuItem>
             </SubMenu>
+            <MenuItem component={<Link to="/admin/manage-category" />}>
+              <div className="flex items-center gap-4">
+                <AiOutlineBars className="w-5 h-5" />
+                Quản lý danh mục
+              </div>
+            </MenuItem>
+
             <MenuItem component={<Link to="/admin/manage-order" />}>
               <div className="flex items-center gap-4">
                 <FaClipboardList className="w-5 h-5" />
@@ -123,9 +176,12 @@ const ManageVoucher = () => {
                 Quản lý voucher
               </div>
             </MenuItem>
-            <SubMenu label="Quản lý bài viết" icon={<FaRegEdit className="w-5 h-5" />}>
-              <MenuItem component={<Link to="/admin/manage-blog" />}>Danh sách bài viết</MenuItem>
-            </SubMenu>
+            <MenuItem component={<Link to="/admin/manage-blog" />}>
+              <div className="flex items-center gap-4">
+                <FaRegEdit className="w-5 h-5" />
+                Quản lý bài viết
+              </div>
+            </MenuItem>
             <MenuItem component={<Link to="/admin/manage-contact" />}>
               <div className="flex items-center gap-4">
                 <MdMarkEmailRead />
@@ -134,10 +190,17 @@ const ManageVoucher = () => {
             </MenuItem>
             <MenuItem component={<Link to="/admin/stock" />}>
               <div className="flex items-center gap-4">
-              <MdInventory />
+                <MdInventory />
                 Quản lý tồn kho
               </div>
             </MenuItem>
+            <MenuItem component={<Link to="/admin/manage-comment" />}>
+              <div className="flex items-center gap-4">
+                <FaCommentAlt />
+                Quản lý bình luận
+              </div>
+            </MenuItem>
+
             <MenuItem onClick={handleLogout}>
               <div className="flex items-center gap-4">
                 <MdLogout />
@@ -185,6 +248,7 @@ const ManageVoucher = () => {
                   <th>Đơn hàng tối thiểu</th>
                   <th>Ngày hiệu lực</th>
                   <th>Ngày kết thúc</th>
+                  <th>Trạng thái</th>
                   <th className="text-center">Thao tác</th>
                 </tr>
               </thead>
@@ -200,10 +264,12 @@ const ManageVoucher = () => {
                       <td>{item.code}</td>
                       <td>{item.type}</td>
                       <td>
-                        {Number(item.discountValue).toLocaleString("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        })}
+                        {item.type === "Discount"
+                          ? `${item.discountValue}%`
+                          : Number(item.discountValue).toLocaleString("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            })}
                       </td>
                       <td>
                         {Number(item.minimumOrderValue).toLocaleString("vi-VN", {
@@ -214,13 +280,26 @@ const ManageVoucher = () => {
                       <td>{formatEffectiveDate}</td>
                       <td>{formatExpirationDate}</td>
                       <td>
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => handleUpdateStatus(item._id, item.isActive)}
+                            className="w-28 text-[12px] justify-items-center p-2 rounded-lg text-white cursor-pointer flex items-center justify-center gap-2"
+                            style={{
+                              backgroundColor: item.isActive ? "#166534" : "#ef4444",
+                            }}>
+                            {item.isActive ? "Đang hoạt động" : "Ngưng hoạt động"}
+                          </button>
+                        </div>
+                      </td>
+                      <td className="flex justify-center">
                         <div className="flex items-center justify-center gap-3">
                           <Link to={`/admin/edit-voucher/${item._id}`}>
                             <FaUserEdit className="w-5 h-5 text-main" />
                           </Link>
-                          <button onClick={(e) => handleDelete(item._id)}>
+                          {/* <button onClick={(e) => handleDelete(item._id)}>
                             <FaTrashAlt className="w-5 h-4 text-red" />
-                          </button>
+                          </button> */}
                         </div>
                       </td>
                     </tr>

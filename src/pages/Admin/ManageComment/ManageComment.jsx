@@ -1,25 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
-import { FaBook, FaClipboardList, FaRegEdit, FaUser, FaGift, FaCommentAlt } from "react-icons/fa";
-import { MdLogout, MdInventory, MdOutlinePreview } from "react-icons/md";
+import {
+  FaBook,
+  FaClipboardList,
+  FaRegEdit,
+  FaUser,
+  FaEye,
+  FaGift,
+  FaCommentAlt,
+} from "react-icons/fa";
+import { MdLogout, MdOutlinePreview } from "react-icons/md";
 import { AiFillDashboard, AiOutlineBars } from "react-icons/ai";
-import { MdMarkEmailRead } from "react-icons/md";
-
 import PageTitle from "../../../components/PageTitle/PageTitle";
 import HeaderAdmin from "../../../components/HeaderAdmin/HeaderAdmin";
-import Button from "../../../components/Button/Button";
-import { useForm } from "react-hook-form";
-import Swal from "sweetalert2";
 import axios from "axios";
+import { MdInventory } from "react-icons/md";
 import { URL_API } from "../../../constants/constants";
-import { showSwalFireSuccess } from "../../../helpers/helpers";
+import { showSwalFireDelete } from "../../../helpers/helpers";
+import { MdMarkEmailRead } from "react-icons/md";
 import Cookies from "js-cookie";
-const AddBlog = () => {
-  const [selectedImage, setSelectedImage] = useState(null);
+const ManageComment = () => {
+  const isAdmin = true;
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [user, setUser] = useState({});
+  const [listComment, setListComment] = useState([]);
+
   // Lấy dữ liệu người dùng từ cookie
   useEffect(() => {
     const userData = Cookies.get("user");
@@ -27,6 +34,19 @@ const AddBlog = () => {
       const parsedUser = JSON.parse(userData);
       setUser(parsedUser.user);
     }
+  }, []);
+
+  useEffect(() => {
+    const fetchDataComment = async () => {
+      try {
+        const response = await axios.get(`${URL_API}/comment`);
+        const data = response.data;
+        setListComment(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchDataComment();
   }, []);
 
   // Đăng xuất xóa cookie người dùng
@@ -38,55 +58,10 @@ const AddBlog = () => {
     navigate("/sign-in");
     window.location.reload();
   };
-
-  const handleImageChange = (e) => {
-    const { files } = e.target;
-    if (files && files[0]) {
-      const fileURL = URL.createObjectURL(files[0]);
-      setSelectedImage({
-        file: files[0],
-        preview: fileURL,
-      });
-    }
-  };
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-
-  const onSubmit = async (data) => {
-    try {
-      const formData = new FormData();
-      formData.append("name", data.name);
-      formData.append("content", data.content);
-      formData.append("date", data.date);
-      formData.append("image", data.image[0]);
-      const response = await axios.post(`${URL_API}/blog`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      showSwalFireSuccess("Thêm bài viết thành công");
-      navigate("/admin/manage-blog");
-    } catch (error) {
-      console.error("Error creating blog:", error);
-      Swal.fire({
-        position: "top-end",
-        icon: "error",
-        title: "Có lỗi xảy ra!",
-        text: error.message,
-        showConfirmButton: true,
-      });
-    }
-  };
-  const handleCancel = () => {
-    navigate("/admin/manage-blog");
-  };
   return (
     <div>
       <div className="flex min-h-screen border">
+        {/* Sidebar */}
         <Sidebar
           className={`relative border p-3 bg-white ${collapsed ? "collapsed" : "expanded"}`}
           width={collapsed ? "0px" : "270px"}>
@@ -180,73 +155,61 @@ const AddBlog = () => {
             />
           </svg>
         </button>
+        {/* Main Content */}
         <div className="flex-1 p-6">
           <HeaderAdmin />
-          <div className="flex items-center justify-between pb-8 border-b">
-            <PageTitle title="Thêm bài viết" className="text-mainDark" />
+          <div className="flex items-center justify-between pb-8 border-b pt-3">
+            <PageTitle title="Quản lý bình luận" className="text-mainDark" />
           </div>
-          <div className="border rounded-[10px] py-8 px-5 mt-7">
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
-              <div className="w-full flex flex-col gap-2">
-                <label htmlFor="name">*Tên bài viết</label>
-                <input
-                  type="text"
-                  {...register("name", { required: true })}
-                  id="name"
-                  className="input input-bordered w-full"
-                />
-                {errors.name && <p className="text-red">Tên bài viết là bắt buộc</p>}
-              </div>
-              <div className="w-full flex flex-col gap-2">
-                <label htmlFor="date">*Ngày viết</label>
-                <input
-                  type="date"
-                  {...register("date", { required: true })}
-                  id="date" // Đổi id sang "date"
-                  className="input input-bordered w-full"
-                />
-                {errors.date && <p className="text-red">Ngày viết là bắt buộc</p>}{" "}
-                {/* Sửa lỗi cho trường date */}
-              </div>
-              <div className="w-full flex flex-col gap-2">
-                <label htmlFor="image">*Hình ảnh</label>
-                {selectedImage?.preview && (
-                  <img
-                    src={selectedImage.preview}
-                    alt="Preview"
-                    className="mt-2 max-h-32 w-40 object-cover"
-                  />
+          <div className="mt-6 border rounded-[30px] p-5">
+            <table className="table w-full">
+              <thead className="text-[16px] font-semibold text-black">
+                <tr>
+                  <th>#</th>
+                  <th>Tên người dùng</th>
+                  <th>Nội dung</th>
+                  <th>Ngày</th>
+                  <th className="text-center">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                {listComment && listComment.length > 0 ? (
+                  listComment.map((item, index) => {
+                    const dateObj = new Date(item.day);
+                    const formattedDate = dateObj.toLocaleDateString("vi-VN"); // 'vi-VN' for dd/mm/yyyy format
+                    return (
+                      <tr key={item._id}>
+                        <td>{index + 1}</td>
+                        <td>{item?.user?.name}</td>
+                        <td>{item.content}</td>
+                        <td>{formattedDate}</td>
+                        <td>
+                          <div className="flex items-center justify-center gap-3">
+                            <button>
+                              <Link to={`/admin/detail-comment/${item._id}`}>
+                                <FaEye className="w-5 h-4 text-mainDark" />
+                              </Link>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="text-center">
+                      Không có bình luận nào.
+                    </td>
+                  </tr>
                 )}
-                <input
-                  type="file"
-                  {...register("image", { required: true })}
-                  id="image"
-                  className="file-input file-input-bordered w-full"
-                  onChange={handleImageChange}
-                />
-                {errors.image && <p className="text-red">Hình ảnh là bắt buộc</p>}
-              </div>
-              <div className="w-full flex flex-col gap-2">
-                <label htmlFor="content">Nội dung</label>
-                <textarea
-                  {...register("content", { required: true })}
-                  id="content"
-                  className="input input-bordered w-full h-32"
-                />
-                {errors.content && <p className="text-red">Nội dung là bắt buộc</p>}
-              </div>
-              <div className="flex items-center gap-3">
-                <Button>Lưu</Button>
-                <Button className="bg-secondary" onClick={handleCancel}>
-                  Hủy
-                </Button>
-              </div>
-            </form>
+              </tbody>
+            </table>
           </div>
+          {/* Content goes here */}
         </div>
       </div>
     </div>
   );
 };
 
-export default AddBlog;
+export default ManageComment;

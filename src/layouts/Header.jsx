@@ -97,7 +97,7 @@ const Header = () => {
           <div className="flex justify-between p-[10px]">
             <div className="flex items-center gap-2">
               <BiPhoneCall className="w-6 h-6" />
-              <p>0123 456 789</p>
+              <p>(+84) 776 831 909</p>
             </div>
             <div className="flex items-center gap-8">
               <Link to="/favorites">
@@ -139,7 +139,7 @@ const Header = () => {
             <div>
               <a href="/">
                 <img
-                  src="./images/logo.png"
+                  src="./images/logo-booktopia.png"
                   className="cursor-pointer w-52 max-md:mb-5 max-lg:mb-5"
                   alt="logo"
                 />
@@ -186,14 +186,23 @@ const Header = () => {
                     </div>
                   </Link>
                 </div>
-                <Link to="/sign-in">
-                  <FaUser className="w-8 h-8" />
-                </Link>
+                {/* Kiểm tra người dùng đã đăng nhập hay chưa */}
+                {userInfo || user ? (
+                  // Nếu đã đăng nhập, điều hướng đến trang Profile
+                  <Link to="/profile">
+                    <FaUser className="w-7 h-7 hover:text-mainDark cursor-pointer" />
+                  </Link>
+                ) : (
+                  // Nếu chưa đăng nhập, hiển thị biểu tượng người dùng dẫn đến trang đăng nhập
+                  <Link to="/sign-in">
+                    <FaUser className="w-7 h-7 hover:text-mainDark cursor-pointer" />
+                  </Link>
+                )}
               </div>
             </div>
             <div
               ref={menuRef}
-              className={`fixed z-50 top-0 left-0 h-screen w-2/4 bg-white shadow-md transition-transform duration-300 block max-2xl:hidden max-sm:block ${
+              className={`fixed z-50 top-0 left-0 h-screen w-2/4 bg-white shadow-md transition-transform duration-300 block 2xl:hidden max-sm:block ${
                 isMenuOpen
                   ? "transform translate-x-0 max-sm:duration-300 max-sm:transition-transform"
                   : "transform -translate-x-full"

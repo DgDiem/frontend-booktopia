@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { URL_API } from "../../constants/constants";
 import { AuthContext } from "../../contexts/AuthProvider"; // Import AuthContext
-
+import "./Profile.css";
 const Profile = () => {
   const { user, logOut } = useContext(AuthContext); // Lấy thông tin người dùng và hàm logOut từ AuthContext
   const navigate = useNavigate();
@@ -15,7 +15,8 @@ const Profile = () => {
   // Hàm lấy URL của ảnh đại diện
   const getAvatarUrl = (image) => {
     if (!image) return defaultAvatar;
-    if (image.startsWith("http://") || image.startsWith("https://")) return image;
+    if (image.startsWith("http://") || image.startsWith("https://"))
+      return image;
     return `${URL_API}/images/${image}`;
   };
 
@@ -52,12 +53,15 @@ const Profile = () => {
   const userImage = parsedUser?.user?.image || user?.photoURL || user?.image;
 
   return (
-    <div className="drawer-end z-50">
+    <div className="drawer-end z-50 max-md:drawer-end">
       <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content">
         {/* Nút avatar để mở sidebar */}
-        <label htmlFor="my-drawer-4" className="drawer-button btn btn-circle btn-ghost avatar">
-          <div className="w-20 rounded-full">
+        <label
+          htmlFor="my-drawer-4"
+          className="drawer-button btn btn-circle btn-ghost avatar"
+        >
+          <div className="w-10 rounded-full">
             {/* Hiển thị ảnh của người dùng (photoURL nếu có, nếu không thì dùng ảnh mặc định) */}
             <img
               alt="User avatar"
@@ -68,23 +72,28 @@ const Profile = () => {
         </label>
       </div>
       <div className="drawer-side">
-        <label htmlFor="my-drawer-4" aria-label="close sidebar" className="drawer-overlay"></label>
+        <label
+          htmlFor="my-drawer-4"
+          aria-label="close sidebar"
+          className="drawer-overlay"
+        ></label>
         <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4">
           <li>
             <Link to="/profile" onClick={closeSidebar}>
-              Profile
+              Thông tin tài khoản
             </Link>
           </li>
           <li>
-            <Link to="/orders" onClick={closeSidebar}>
-              Orders
+            <Link to="/my-orders" onClick={closeSidebar}>
+              Đơn hàng của tôi
             </Link>
           </li>
-          <li>
+          {/*<li>
             <Link to="/settings" onClick={closeSidebar}>
-              Settings
+              Cài đặt
             </Link>
           </li>
+          */}
           {user?.role === "admin" && (
             <li>
               <Link to="/dashboard" onClick={closeSidebar}>
@@ -97,8 +106,9 @@ const Profile = () => {
               onClick={() => {
                 handleLogout();
                 closeSidebar();
-              }}>
-              Logout
+              }}
+            >
+              Đăng xuất
             </a>
           </li>
         </ul>

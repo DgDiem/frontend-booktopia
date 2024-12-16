@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { FaEye, FaShoppingBag,FaTimesCircle  } from "react-icons/fa";
+import { FaEye, FaShoppingBag, FaTimesCircle } from "react-icons/fa";
 import "../../index.css";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -46,10 +46,10 @@ const ProductItem = ({ className = "", item }) => {
   };
   const showSwalFireError = (message) => {
     Swal.fire({
-      title: 'Không thể thêm',
+      title: "Không thể thêm",
       text: message,
-      icon: 'error',
-      confirmButtonText: 'OK',
+      icon: "error",
+      confirmButtonText: "OK",
     });
   };
   const handleAddToFavourite = () => {
@@ -86,7 +86,7 @@ const ProductItem = ({ className = "", item }) => {
           className={`flex ${
             isHorizontal ? "flex-row border justify-start max-lg:flex-col" : "flex-col"
           } items-center gap-4 text-center cursor-pointer py-5 px-2 relative max-md:py-2 max-md:px-0`}>
-          <div className="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center text-white absolute left-6 top-0 ">
+          <div className="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center text-white absolute left-6 top-0 max-md:w-10 max-md:h-10 max-md:text-[16px] max-md:p-2 max-md:left-1">
             {`${Math.round(((price1 - price2) / price1) * 100)}%`}
           </div>
           <img
@@ -145,12 +145,14 @@ const ProductItem = ({ className = "", item }) => {
             onClick={handleAddToFavourite}
             className="text-mainDark w-9 h-10 text-2xl bg-white border bg-opacity-50 p-2 rounded-full transform translate-x-full group-hover:translate-x-0 transition-transform duration-300 hover:bg-grayText hover:text-white hover:cursor-pointer"
           />
-               {item.quantity === 0 ? (
-          <FaTimesCircle     className="text-mainDark w-10 h-10 text-2xl bg-white border bg-opacity-50 p-2 rounded-full transform translate-x-full group-hover:translate-x-0 transition-transform duration-300 hover:bg-grayText hover:text-white cursor-pointer"/>
-          ) : ( <FaShoppingBag
-            onClick={handleAddToCart}
-            className="text-mainDark w-10 h-10 text-2xl bg-white border bg-opacity-50 p-2 rounded-full transform translate-x-full group-hover:translate-x-0 transition-transform duration-300 hover:bg-grayText hover:text-white cursor-pointer"
-          />   )}
+          {item.quantity === 0 ? (
+            <FaTimesCircle className="text-mainDark w-10 h-10 text-2xl bg-white border bg-opacity-50 p-2 rounded-full transform translate-x-full group-hover:translate-x-0 transition-transform duration-300 hover:bg-grayText hover:text-white cursor-pointer" />
+          ) : (
+            <FaShoppingBag
+              onClick={handleAddToCart}
+              className="text-mainDark w-10 h-10 text-2xl bg-white border bg-opacity-50 p-2 rounded-full transform translate-x-full group-hover:translate-x-0 transition-transform duration-300 hover:bg-grayText hover:text-white cursor-pointer"
+            />
+          )}
         </div>
       </div>
     </div>
