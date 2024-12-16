@@ -26,7 +26,9 @@ const SignInPage = () => {
   const googleProvider = new GoogleAuthProvider(); // Khởi tạo provider Google
   // Định nghĩa schema validation
   const validationSchema = Yup.object({
-    email: Yup.string().email("Email không hợp lệ").required("Vui lòng nhập email"),
+    email: Yup.string()
+      .email("Email không hợp lệ")
+      .required("Vui lòng nhập email"),
     password: Yup.string().required("Vui lòng nhập mật khẩu"),
   });
 
@@ -60,6 +62,7 @@ const SignInPage = () => {
         email: user.email,
         displayName: user.displayName,
         photoURL: user.photoURL || "./images/avatar.png", // Dùng ảnh mặc định nếu không có ảnh từ Google
+        role: -2,
       };
 
       // Lưu thông tin người dùng vào cookie
@@ -130,11 +133,21 @@ const SignInPage = () => {
       <div className="container">
         <div className="flex items-center justify-between gap-16">
           <div className="max-w-[650px] w-full max-md:hidden">
-            <img src="./images/bannersach 1.png" className="w-full rounded-[30px]" alt="" />
+            <img
+              src="./images/bannersach 1.png"
+              className="w-full rounded-[30px]"
+              alt=""
+            />
           </div>
           <div className="w-full">
-            <PageTitle title="Đăng nhập" className="text-center mb-6"></PageTitle>
-            <form className="flex flex-col gap-6" onSubmit={handleSubmit(onSubmit)}>
+            <PageTitle
+              title="Đăng nhập"
+              className="text-center mb-6"
+            ></PageTitle>
+            <form
+              className="flex flex-col gap-6"
+              onSubmit={handleSubmit(onSubmit)}
+            >
               <div className="w-full">
                 <input
                   type="email"
@@ -143,7 +156,9 @@ const SignInPage = () => {
                   {...register("email")}
                 />
                 {errors.email && (
-                  <div className="text-red mt-1 text-sm">{errors.email.message}</div>
+                  <div className="text-red mt-1 text-sm">
+                    {errors.email.message}
+                  </div>
                 )}
               </div>
               <div className="w-full">
@@ -154,17 +169,24 @@ const SignInPage = () => {
                   {...register("password")}
                 />
                 {errors.password && (
-                  <div className="text-red mt-1 text-sm">{errors.password.message}</div>
+                  <div className="text-red mt-1 text-sm">
+                    {errors.password.message}
+                  </div>
                 )}
               </div>
-              <div className="text-right text-sm font-normal leading-normal">Quên mật khẩu?</div>
+              <div className="text-right text-sm font-normal leading-normal">
+                Quên mật khẩu?
+              </div>
               <div>
                 <Button
                   type="submit"
                   children="ĐĂNG NHẬP"
                   className="w-full"
-                  disabled={isSubmitting}></Button>
-                {errors.general && <p className="my-3 text-danger">{errors.general.message}</p>}
+                  disabled={isSubmitting}
+                ></Button>
+                {errors.general && (
+                  <p className="my-3 text-danger">{errors.general.message}</p>
+                )}
               </div>
               <div className="text-center">Hoặc đăng nhập bằng</div>
               <div className="flex items-center gap-5">
@@ -174,7 +196,8 @@ const SignInPage = () => {
                 </div>
                 <div
                   onClick={signUpWithGoogle}
-                  className="bg-btnGoogle w-full rounded-[10px] py-3 px-10 text-white h-10 flex items-center gap-2 justify-center cursor-pointer">
+                  className="bg-btnGoogle w-full rounded-[10px] py-3 px-10 text-white h-10 flex items-center gap-2 justify-center cursor-pointer"
+                >
                   <FaGooglePlusG className="w-5 h-5"></FaGooglePlusG>
                   Google
                 </div>

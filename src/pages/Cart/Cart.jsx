@@ -25,20 +25,20 @@ const Cart = () => {
       // Gọi API để lấy thông tin sản phẩm
       const response = await fetch(`${URL_API}/products/${itemId}`);
       const product = await response.json();
-  
+
       // Kiểm tra nếu số lượng trong giỏ hàng nhỏ hơn số lượng tồn kho
       const itemInCart = cartItems.find((item) => item._id === itemId);
-  
+
       if (itemInCart.quantity < product.quantity) {
         // Cập nhật số lượng trong giỏ hàng
         dispatch(updateCartItemQuantity({ id: itemId, quantity: 1 }));
       } else {
         // Thay alert bằng Swal để hiển thị thông báo đẹp
         Swal.fire({
-          title: 'Không thể tăng số lượng!',
+          title: "Không thể tăng số lượng!",
           text: `Chỉ còn ${product.quantity} sản phẩm trong kho!`,
-          icon: 'warning',
-          confirmButtonText: 'OK'
+          icon: "warning",
+          confirmButtonText: "OK",
         });
       }
     } catch (error) {
@@ -227,13 +227,15 @@ const Cart = () => {
                 <div className="border-t">
                   <div className="pt-8 flex items-center justify-between">
                     <div>
-                      <Button className="rounded-[5px] bg-white button-add max-md:hidden max-lg:h-10">
-                        Tiếp tục mua hàng
-                      </Button>
+                      <Link to="/">
+                        <Button className="rounded-[5px] bg-white button-add max-md:hidden ">
+                          Tiếp tục mua hàng
+                        </Button>
+                      </Link>
                     </div>
                     <div>
                       <Button
-                        className="rounded-[5px] bg-white button-add max-md:hidden max-lg:h-10"
+                        className="rounded-[5px] bg-white button-add max-md:hidden"
                         onClick={handleClearItem}>
                         Xóa tất cả
                       </Button>
@@ -273,7 +275,9 @@ const Cart = () => {
               </div>
               <div className="flex justify-between my-5">
                 <span className="text-text font-normal leading-normal">Phí vận chuyển:</span>
-                <span className="text-text font-normal leading-normal">Miễn phí</span>
+                <span className="text-text font-normal leading-normal">
+                  Áp dụng tại trang thanh toán
+                </span>
               </div>
               <div className="flex justify-between font-semibold text-lg mb-3">
                 <span>Tổng cộng:</span>
@@ -287,13 +291,13 @@ const Cart = () => {
               <Button className="w-full rounded-[5px] mt-5">
                 <Link to="/checkout">Thanh toán</Link>
               </Button>
-              <div className="text-center my-5">Hỗ trợ thanh toán với</div>
+              {/* <div className="text-center my-5">Hỗ trợ thanh toán với</div>
               <div className="flex items-center justify-center gap-5">
                 <img src="./images/visa.png" alt="Visa" />
                 <img src="./images/napas.png" alt="Napas" />
                 <img src="./images/momo.png" alt="Momo" />
                 <img src="./images/zalopay.png" alt="ZaloPay" />
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -310,7 +314,7 @@ const Cart = () => {
             </span>
           </div>
           <Button className="rounded-lg bg-green-600 text-white px-4 py-2">
-            <Link to="{`/checkout?id=${item._id}`}">Thanh toán</Link>
+            <Link to="/checkout">Thanh toán</Link>
           </Button>
         </div>
       </div>

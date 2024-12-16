@@ -103,10 +103,10 @@ const Profile = () => {
           const data = res.data;
           setValue("name", data.name || user.displayName);
           setValue("username", data.username);
-          setValue("date", data.date);
+          setValue("date", data.date || "");
           setValue("email", data.email);
           setValue("phone", data.phone);
-          setValue("address", data.address);
+          setValue("address", data.address || "");
           // Hiển thị hình ảnh hiện tại
           setImage(data.image ? `${URL_API}/images/${data.image}` : defaultAvatar);
         } else {
@@ -194,9 +194,9 @@ const Profile = () => {
   return (
     <div className="py-10">
       <div className="container">
-        <div className="flex gap-10">
-          <div className="max-w-[300px] w-full">
-            <div className="flex items-center gap-2">
+        <div className="flex gap-10 max-md:flex-col max-lg:flex-col">
+          <div className="max-w-[300px] w-full max-md:w-full max-lg:w-full">
+            <div className="flex items-center gap-2 max-md:flex-col">
               <img
                 src={selectedImage?.preview || image}
                 className="w-[50px] h-[50px] rounded-full"
@@ -236,13 +236,13 @@ const Profile = () => {
               ))}
             </ul>
           </div>
-          <div className="w-3/5">
+          <div className="w-3/5 max-md:w-full max-lg:w-full">
             <PageTitle title="Cập nhật tài khoản" className="text-mainDark mb-2"></PageTitle>
             <div className="text-grayText leading-normal font-normal mb-5">
               Chỉnh sửa thông tin cá nhân, tài khoản và mật khẩu
             </div>
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
-              <div className="flex items-center justify-center gap-5">
+            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6 max-lg:gap-3">
+              <div className="flex items-center justify-center gap-5 max-md:flex-col max-lg:flex-col">
                 <div className="w-full">
                   <label htmlFor="name">Họ và tên</label>
                   <input
@@ -264,7 +264,7 @@ const Profile = () => {
                   />
                 </div>
               </div>
-              <div className="flex items-center justify-center gap-5">
+              <div className="flex items-center justify-center gap-5 max-md:flex-col max-lg:flex-col">
                 <div className="w-full">
                   <label htmlFor="email">Email</label>
                   <input
@@ -286,7 +286,7 @@ const Profile = () => {
                   />
                 </div>
               </div>
-              <div className="flex items-center justify-center gap-5">
+              <div className="flex items-center justify-center gap-5 max-md:flex-col max-lg:flex-col">
                 <div className="w-full">
                   <label htmlFor="address">Địa chỉ</label>
                   <input
@@ -303,7 +303,9 @@ const Profile = () => {
                     type="date"
                     id="date"
                     className="input input-bordered w-full mt-2"
-                    {...register("date")}
+                    {...register("date", {
+                      value: user?.date || "", // Nếu user.date là undefined, sử dụng giá trị mặc định là chuỗi rỗng
+                    })}
                   />
                 </div>
               </div>

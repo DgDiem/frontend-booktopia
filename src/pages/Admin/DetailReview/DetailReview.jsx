@@ -1,48 +1,48 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
-import { MdInventory } from "react-icons/md";
+import Cookies from "js-cookie";
 import {
   FaBook,
   FaClipboardList,
   FaRegEdit,
-  FaTrashAlt,
   FaUser,
-  FaCommentAlt,
-  FaUserClock,
+  FaImage,
   FaGift,
+  FaCommentAlt,
+  FaStar,
 } from "react-icons/fa";
-import { MdOutlinePreview } from "react-icons/md";
-import { MdLogout } from "react-icons/md";
+import { MdLogout, MdOutlinePreview } from "react-icons/md";
 import { AiFillDashboard, AiOutlineBars } from "react-icons/ai";
+import { MdMarkEmailRead } from "react-icons/md";
+import { MdInventory } from "react-icons/md";
+import axios from "axios";
+import Swal from "sweetalert2";
+
 import PageTitle from "../../../components/PageTitle/PageTitle";
 import HeaderAdmin from "../../../components/HeaderAdmin/HeaderAdmin";
-import Cookies from "js-cookie";
-import axios from "axios";
 import { URL_API } from "../../../constants/constants";
-import { MdMarkEmailRead } from "react-icons/md";
+import Button from "../../../components/Button/Button";
 
-const PurchaseHistory = () => {
-  const isAdmin = true;
+const DetailReview = () => {
   const navigate = useNavigate();
-  const [collapsed, setCollapsed] = useState(false);
-  const [orders, setOrders] = useState([]);
   const [user, setUser] = useState({});
   const { id } = useParams();
 
-  const fetchOrders = async (userId) => {
-    try {
-      const response = await axios.get(`${URL_API}/orders/user/${userId}`);
-      setOrders(response.data);
-    } catch (error) {
-      console.error("Lỗi khi gọi API:", error);
-    }
-  };
+  const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      fetchOrders(id);
-    }
+    const fetchOrderDetails = async () => {
+      try {
+        const response = await axios.get(`${URL_API}/orders/${id}`);
+        console.log(response.data);
+
+        setOrder(response.data);
+      } catch (error) {
+        console.error("Error fetching order details:", error.response?.data || error.message);
+      }
+    };
+    fetchOrderDetails();
   }, [id]);
   // Lấy dữ liệu người dùng từ cookie
   useEffect(() => {
@@ -62,7 +62,6 @@ const PurchaseHistory = () => {
     navigate("/sign-in");
     window.location.reload();
   };
-
   return (
     <div>
       <div className="flex min-h-screen border">
@@ -169,85 +168,116 @@ const PurchaseHistory = () => {
         <div className="flex-1 p-6">
           <HeaderAdmin />
           <div className="flex items-center justify-between pb-8 border-b pt-3">
-            <PageTitle title="Lịch sử mua hàng" className="text-mainDark" />
+            <PageTitle title={`Chi tiết đánh giá`} className="text-mainDark" />
           </div>
-          {orders.length > 0 ? (
-            orders.map((order) => (
-              <div key={order._id} className="mt-6 border rounded-lg p-5">
-                <div className="flex items-center justify-between pb-3 border-b border-b-gray-300">
-                  <div>
-                    <span>Mã đơn hàng: </span>
-                    <span>{order.orderId}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="pr-3">
-                      Ngày đặt: {new Date(order.date).toLocaleDateString()}
-                    </span>
-                    <span className="text-mainDark border-l border-l-gray-300 pl-3 font-medium">
-                      {order.status}
-                    </span>
-                  </div>
+          <div className="mt-6 border rounded-[30px] p-5">
+            <form action="" className="flex flex-col gap-6">
+              <div className="flex items-center justify-between gap-12">
+                <div className="w-full flex flex-col gap-2">
+                  <label htmlFor="">*Mã đơn hàng</label>
+                  <input
+                    type="text"
+                    placeholder="Type here"
+                    value="BOKTOPIA001"
+                    className="input input-bordered w-full"
+                    readOnly
+                  />
                 </div>
-                {order.listProducts.map((product, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between py-3 border-b border-b-gray-300">
-                    <div className="flex items-center">
-                      <div className="max-w-[110px]">
-                        <img
-                          className="w-full"
-                          src={`${URL_API}/images/${product.image1}`}
-                          alt={product.name}
-                        />
-                      </div>
-                      <div className="flex flex-col gap-3">
-                        <h3 className="font-normal">{product.name}</h3>
-                        <div className="text-sm text-gray-400">{product.author.authorName}</div>
-                        <span className="text-sm">x{product.quantity}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="text-sm text-gray-400 line-through">
-                        {product
-                          ? Number(product.price1).toLocaleString("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            })
-                          : ""}
-                      </div>
-                      <div className="text-lg text-red font-semibold">
-                        {product
-                          ? Number(product.price2).toLocaleString("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            })
-                          : ""}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                <div className="flex justify-end mt-4">
-                  <div className="flex items-center">
-                    <span>Thành tiền: </span>
-                    <div className="text-xl text-red font-semibold ml-3">
-                      {order
-                        ? Number(order.total).toLocaleString("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                          })
-                        : ""}
-                    </div>
-                  </div>
+                <div className="w-full flex flex-col gap-2">
+                  <label htmlFor="">*Tên khách hàng</label>
+                  <input
+                    type="text"
+                    placeholder="Trần Anh Toàn"
+                    value="Trần Anh Toàn"
+                    className="input input-bordered w-full"
+                    readOnly
+                  />
+                </div>
+                <div className="w-full flex flex-col gap-2">
+                  <label htmlFor="">Ngày lập</label>
+                  <input
+                    type="date"
+                    value="15/07/2024"
+                    className="input input-bordered w-full"
+                    readOnly
+                  />
                 </div>
               </div>
-            ))
-          ) : (
-            <div className="text-center text-gray-500 mt-6">Chưa có lịch sử mua hàng</div>
-          )}
+              <div className="flex items-center gap-2">
+                <div className="star-review">*Số sao:</div>
+                <div className="flex items-center">
+                  <FaStar className="text-yellow-500" />
+                  <FaStar className="text-yellow-500" />
+                  <FaStar className="text-yellow-500" />
+                  <FaStar className="text-yellow-500" />
+                  <FaStar className="text-yellow-500" />
+                </div>
+              </div>
+              <div className="w-full flex flex-col gap-2">
+                <label htmlFor="">*Nội dung</label>
+                <input
+                  type="text"
+                  placeholder="Q12, TPHCM"
+                  value="Sách hay, bổ ích"
+                  className="input input-bordered w-full"
+                  readOnly
+                />
+              </div>
+            </form>
+
+            <h1
+              className="text-mainDark"
+              style={{
+                margin: "20px 8px",
+                fontSize: "20px",
+                fontWeight: "bold",
+              }}>
+              Danh sách sản phẩm
+            </h1>
+            <table className="table w-full">
+              <thead className="text-[16px] font-semibold text-black">
+                <tr>
+                  <th>#</th>
+                  <th className="text-center flex items-center justify-center max-w-[150px]">
+                    <FaImage className="w-6 h-6 " />
+                  </th>
+                  <th>Tên sách</th>
+                  <th>Giá</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td className="flex items-center justify-center max-w-[150px]">
+                    <img src={`${URL_API}/images/s44.jpg`} className="w-full" alt="" />
+                  </td>
+                  <td>
+                    <div className="flex flex-col  gap-3">
+                      <div className="" style={{ fontSize: "16px" }}>
+                        <b>
+                          Sử Ký FPT 35 Năm - Từ Tay Trắng Đến Tập Đoàn Toàn Cầu - Bìa Cứng x1 x1
+                        </b>
+                      </div>
+                      <div className="">
+                        Tác giả: Sử Ký FPT 35 Năm - Từ Tay Trắng Đến Tập Đoàn Toàn Cầu - Bìa Cứng 
+                      </div>
+                      <div className="">Thể loại; Tiểu sử - Hồi kí</div>
+                    </div>
+                  </td>
+                  <td>
+                    <div style={{ display: "flex" }}>
+                      <del>199000đ</del>
+                      <div style={{ fontSize: "16px", marginLeft: "10px" }}>199000đ</div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default PurchaseHistory;
+export default DetailReview;

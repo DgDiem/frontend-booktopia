@@ -4,7 +4,7 @@ import ProductList from "../../components/Product/ProductList";
 import { FaLongArrowAltLeft, FaLongArrowAltRight } from "react-icons/fa";
 import PageTitle from "../../components/PageTitle/PageTitle";
 import "./Menu.css";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ProductItem from "../../components/Product/ProductItem";
 import { URL_API } from "../../constants/constants";
@@ -14,6 +14,7 @@ const Menu = () => {
   const [searchTerm, setSearchTerm] = useState(
     new URLSearchParams(location.search).get("search") || ""
   );
+  const [hiddens, setHiddens] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -27,63 +28,63 @@ const Menu = () => {
   const [pageGroup, setPageGroup] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalProducts, setTotalProducts] = useState(0);
-  const pagesPerGroup = 3;
   const [currentCategoryName, setCurrentCategoryName] =
     useState("Tất cả sản phẩm");
+  const navigate = useNavigate();
+  const pagesPerGroup = 3;
+
+  // Xử lý tìm kiếm
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchSearchResults = async () => {
+      if (!searchTerm.trim()) return; // Nếu không có tìm kiếm, bỏ qua
+
       setLoading(true);
       try {
-        const url = searchTerm.trim()
-          ? `${URL_API}/products/search/${searchTerm.trim()}`
-          : `${URL_API}/products`;
+        const url = `${URL_API}/products/search/${searchTerm.trim()}`;
         const response = await axios.get(url);
         setProducts(response.data);
+        setCategoryId(null); // Xóa bộ lọc hiện tại khi tìm kiếm
+        setAuthorId(null);
+        setPublishId(null);
+
+        navigate("/menu", { replace: true }); // Xóa tham số `search` khỏi URL
       } catch (error) {
-        console.error("Lỗi khi tìm kiếm sản phẩm", error);
+        console.error("Lỗi khi tìm kiếm sản phẩm:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProducts();
-  }, [searchTerm]);
+    fetchSearchResults();
+  }, [searchTerm, navigate]);
 
-  // Lấy danh mục, tác giả và nhà xuất bản
+  // Lấy danh mục, tác giả, nhà xuất bản
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchData = async () => {
+      setLoading(true);
       try {
-        const response = await axios.get(`${URL_API}/category`);
-        setCategories(response.data);
+        const [categoriesRes, authorsRes, publishersRes] = await Promise.all([
+          axios.get(`${URL_API}/category`),
+          axios.get(`${URL_API}/authors`),
+          axios.get(`${URL_API}/publishes`),
+        ]);
+        setCategories(categoriesRes.data);
+        setAuthors(authorsRes.data);
+        setPublishers(publishersRes.data);
       } catch (error) {
-        console.error("Lỗi khi lấy danh mục", error);
+        console.error("Lỗi khi lấy thông tin bổ sung:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    const fetchAuthors = async () => {
-      try {
-        const response = await axios.get(`${URL_API}/authors`);
-        setAuthors(response.data);
-      } catch (error) {
-        console.error("Lỗi khi lấy tác giả", error);
-      }
-    };
-
-    const fetchPublishers = async () => {
-      try {
-        const response = await axios.get(`${URL_API}/publishes`);
-        setPublishers(response.data);
-      } catch (error) {
-        console.error("Lỗi khi lấy nhà xuất bản", error);
-      }
-    };
-
-    fetchCategories();
-    fetchAuthors();
-    fetchPublishers();
+    fetchData();
   }, []);
 
+  // Fetch sản phẩm phân trang hoặc theo danh mục, tác giả, nhà xuất bản
   useEffect(() => {
+    if (searchTerm.trim()) return; // Không fetch nếu đang tìm kiếm
+
     const fetchProducts = async () => {
       setLoading(true);
       try {
@@ -120,16 +121,16 @@ const Menu = () => {
         setProducts(response.data.products);
         setTotalPages(response.data.totalPages);
       } catch (error) {
-        console.error("Lỗi khi lấy sản phẩm", error);
+        console.error("Lỗi khi lấy sản phẩm:", error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchProducts();
-  }, [searchTerm, categoryId, authorId, publishId, currentPage, sortOption]);
+  }, [categoryId, authorId, publishId, currentPage, sortOption, searchTerm]);
 
-  const categoryClick = (newCategoryId, categoryName) => {
+  const categoryClick = async (newCategoryId, categoryName) => {
     if (categoryId === newCategoryId) {
       return;
     }
@@ -138,34 +139,74 @@ const Menu = () => {
     setPublishId(null);
     setCurrentCategoryName(categoryName);
     setCurrentPage(1);
-    setProducts([]);
+    setProducts([]); // Xóa sản phẩm cũ trước khi fetch
     setSortOption("Mới nhất");
     setPageGroup(0);
-    setCurrentPage(1);
+
+    // Fetch lại sản phẩm ngay lập tức
+    try {
+      setLoading(true);
+      const limit = 12;
+      const url = `${URL_API}/products/paginated/categoryId/${newCategoryId}?pageNumber=0&limit=${limit}&sortBy=new`;
+      const response = await axios.get(url);
+      setProducts(response.data.products);
+      setTotalPages(response.data.totalPages);
+    } catch (error) {
+      console.error("Lỗi khi fetch sản phẩm theo danh mục:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  //click tác giả
-  const authorClick = (authorId, authorName) => {
-    setAuthorId(authorId);
+  const authorClick = async (newAuthorId, authorName) => {
+    setAuthorId(newAuthorId);
     setCategoryId(null);
     setPublishId(null);
     setCurrentCategoryName(authorName);
     setSortOption("Mới nhất");
     setPageGroup(0);
     setCurrentPage(1);
+    setProducts([]); // Xóa sản phẩm cũ trước khi fetch
+
+    // Fetch lại sản phẩm ngay lập tức
+    try {
+      setLoading(true);
+      const limit = 12;
+      const url = `${URL_API}/products/paginated/authorId/${newAuthorId}?pageNumber=0&limit=${limit}&sortBy=new`;
+      const response = await axios.get(url);
+      setProducts(response.data.products);
+      setTotalPages(response.data.totalPages);
+    } catch (error) {
+      console.error("Lỗi khi fetch sản phẩm theo tác giả:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  //click nhà xuất bản
-  const publishClick = (publishId, publishName) => {
-    setPublishId(publishId);
+  const publishClick = async (newPublishId, publishName) => {
+    setPublishId(newPublishId);
     setCategoryId(null);
     setAuthorId(null);
     setCurrentCategoryName(publishName);
     setSortOption("Mới nhất");
     setPageGroup(0);
     setCurrentPage(1);
-  };
+    setProducts([]); // Xóa sản phẩm cũ trước khi fetch
 
+    // Fetch lại sản phẩm ngay lập tức
+    try {
+      setLoading(true);
+      const limit = 12;
+      const url = `${URL_API}/products/paginated/publisherId/${newPublishId}?pageNumber=0&limit=${limit}&sortBy=new`;
+      const response = await axios.get(url);
+      setProducts(response.data.products);
+      setTotalPages(response.data.totalPages);
+    } catch (error) {
+      console.error("Lỗi khi fetch sản phẩm theo nhà xuất bản:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   const handleNextGroup = () => {
     const nextPageGroup = pageGroup + 1;
     const totalPages = Math.ceil(totalProducts / pagesPerGroup);
@@ -187,7 +228,7 @@ const Menu = () => {
   useEffect(() => {
     const fetchTotalProducts = async () => {
       try {
-        const url = `${URL_API}/products/products/total`;
+        const url = "http://localhost:3000/products/products/total";
         const response = await axios.get(url);
 
         if (response.status === 200) {
@@ -200,6 +241,27 @@ const Menu = () => {
 
     fetchTotalProducts();
   }, []);
+  const renderPageButtons = () => {
+    const startPage = pageGroup * pagesPerGroup + 1;
+    const pages = Array.from(
+      { length: pagesPerGroup },
+      (_, i) => startPage + i
+    );
+
+    return pages.map((page) => (
+      <span
+        key={page}
+        className={`w-10 h-10 rounded-full flex items-center justify-center ${
+          currentPage === page
+            ? "bg-mainDark text-white"
+            : "border text-grayText"
+        } text-[20px] font-semibold cursor-pointer`}
+        onClick={() => setCurrentPage(page)}
+      >
+        {page}
+      </span>
+    ));
+  };
   const handlePrevGroup = () => {
     if (pageGroup > 0) {
       const prevPageGroup = pageGroup - 1;
@@ -216,40 +278,9 @@ const Menu = () => {
     }
   };
 
-  const renderPageButtons = () => {
-    const startPage = pageGroup * pagesPerGroup + 1;
-    const pages = Array.from(
-      { length: pagesPerGroup },
-      (_, i) => startPage + i
-    );
-
-    return pages.map((page) => (
-      <span
-        key={page}
-        className={`w-10 h-10 rounded-full flex items-center justify-center ${
-          currentPage === page
-            ? "bg-mainDark text-white"
-            : "border text-grayText"
-        } text-[20px] font-semibold cursor-pointer`}
-        onClick={() => handlePageClick(page)}
-      >
-        {page}
-      </span>
-    ));
-  };
-
   return (
     <div className="mt-8">
       <div className="container mx-auto">
-        <nav>
-          <a href="#" className="text-gray-500">
-            Trang chủ
-          </a>
-          <span className="text-gray-500"> / </span>
-          <a href="#" className="text-mainDark font-semibold leading-normal">
-            Sản phẩm
-          </a>
-        </nav>
         <div className="py-8 max-lg:py-4">
           <div className="flex justify-between gap-5 mt-12 max-lg:mt-4">
             <div className="max-w-[275px] w-full max-lg:hidden">
@@ -276,16 +307,12 @@ const Menu = () => {
             <div className="w-full">
               <div className="flex items-center justify-between mb-6">
                 <PageTitle title={currentCategoryName || "Tất cả sản phẩm"} />
-
                 <div className="flex items-center gap-4">
                   <select
                     className="select select-bordered w-full max-w-xs custom-select"
                     value={sortOption}
                     onChange={(e) => setSortOption(e.target.value)}
                   >
-                    <option disabled value="">
-                      Sắp xếp theo:
-                    </option>
                     <option value="Mới nhất">Mới nhất</option>
                     <option value="Giá tăng dần">Giá tăng dần</option>
                     <option value="Giá giảm dần">Giá giảm dần</option>
@@ -296,7 +323,7 @@ const Menu = () => {
               {loading ? (
                 <div className="text-center">Đang tải sản phẩm...</div>
               ) : products.length > 0 ? (
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-4 gap-4 max-md:grid-cols-2">
                   {products.map((item) => (
                     <ProductItem key={item._id} item={item} />
                   ))}

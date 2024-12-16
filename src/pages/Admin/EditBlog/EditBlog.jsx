@@ -1,8 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
-import { FaBook, FaClipboardList, FaRegEdit, FaUser, FaGift } from "react-icons/fa";
-import { MdLogout } from "react-icons/md";
+import {
+  FaBook,
+  FaClipboardList,
+  FaRegEdit,
+  FaUser,
+  FaGift,
+  FaCommentAlt,
+} from "react-icons/fa";
+import { MdLogout, MdOutlinePreview } from "react-icons/md";
 import { AiFillDashboard, AiOutlineBars } from "react-icons/ai";
 import { MdMarkEmailRead } from "react-icons/md";
 import { MdInventory } from "react-icons/md";
@@ -14,16 +21,31 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { URL_API } from "../../../constants/constants.js";
 import { showSwalFireSuccess } from "../../../helpers/helpers";
-
+import Cookies from "js-cookie";
 const EditBlog = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const { id } = useParams();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
-  const handleLogout = () => {
-    navigate("/");
-  };
+  const [user, setUser] = useState({});
+  // Lấy dữ liệu người dùng từ cookie
+  useEffect(() => {
+    const userData = Cookies.get("user");
+    if (userData) {
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser.user);
+    }
+  }, []);
 
+  // Đăng xuất xóa cookie người dùng
+  const handleLogout = () => {
+    // Xử lý logout, ví dụ xóa cookie và chuyển hướng người dùng
+    Cookies.remove("user");
+    setUser(null);
+    // Chuyển hướng hoặc cập nhật state để hiển thị UI phù hợp
+    navigate("/sign-in");
+    window.location.reload();
+  };
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -81,85 +103,117 @@ const EditBlog = () => {
       });
     }
   };
-
+  const handleCancel = () => {
+    navigate("/admin/manage-blog");
+  };
   return (
     <div>
       <div className="flex min-h-screen border">
         <Sidebar
-          className={`relative border p-3 bg-white ${collapsed ? "collapsed" : "expanded"}`}
-          width={collapsed ? "0px" : "270px"}>
-          <Menu className="bg-white">
-            <div className="flex items-center justify-center mb-6">
-              <img src="./images/logo.png" alt="Logo" />
-            </div>
-            <MenuItem component={<Link to="/admin/dashboard" />}>
-              <div className="flex items-center gap-4">
-                <AiFillDashboard className="w-5 h-5" />
-                Dashboard
-              </div>
-            </MenuItem>
-
-            <SubMenu label="Quản lý danh mục" icon={<AiOutlineBars className="w-5 h-5" />}>
-              <MenuItem component={<Link to="/admin/manage-category" />}>
-                Danh sách danh mục
-              </MenuItem>
-            </SubMenu>
-            <SubMenu label="Quản lý sản phẩm" icon={<FaBook className="w-5 h-5" />}>
-              <MenuItem component={<Link to="/admin/manage-product" />}>
-                Danh sách sản phẩm
-              </MenuItem>
-              <MenuItem component={<Link to="/admin/manage-author" />}>Tác giả</MenuItem>
-              <MenuItem component={<Link to="/admin/manage-publishes" />}>Nhà xuất bản</MenuItem>
-            </SubMenu>
-            <MenuItem component={<Link to="/admin/manage-items" />}>
-              <div className="flex items-center gap-4">
-                <FaClipboardList className="w-5 h-5" />
-                Quản lý đơn hàng
-              </div>
-            </MenuItem>
-            <MenuItem component={<Link to="/admin/manage-user" />}>
-              <div className="flex items-center gap-4">
-                <FaUser />
-                Quản lý tài khoản
-              </div>
-            </MenuItem>
-            <MenuItem component={<Link to="/admin/manage-voucher" />}>
-              <div className="flex items-center gap-4">
-                <FaGift />
-                Quản lý voucher
-              </div>
-            </MenuItem>
-            <SubMenu label="Quản lý bài viết" icon={<FaRegEdit className="w-5 h-5" />}>
-              <MenuItem component={<Link to="/admin/manage-blog" />}>Danh sách bài viết</MenuItem>
-            </SubMenu>
-            <MenuItem component={<Link to="/admin/manage-contact" />}>
-              <div className="flex items-center gap-4">
-                <MdMarkEmailRead />
-                Quản lý liên hệ
-              </div>
-            </MenuItem>
-            <MenuItem component={<Link to="/admin/stock" />}>
-              <div className="flex items-center gap-4">
-              <MdInventory />
-                Quản lý tồn kho
-              </div>
-            </MenuItem>
-            <MenuItem onClick={handleLogout}>
-              <div className="flex items-center gap-4">
-                <MdLogout />
-                Đăng xuất
-              </div>
-            </MenuItem>
-          </Menu>
+          className={`relative border p-3 bg-white ${
+            collapsed ? "collapsed" : "expanded"
+          }`}
+          width={collapsed ? "0px" : "270px"}
+        >
+        <Menu className="bg-white">
+        <div className="flex items-center justify-center mb-6">
+          <img src="./images/logo.png" alt="Logo" />
+        </div>
+        <MenuItem component={<Link to="/admin/dashboard" />}>
+          <div className="flex items-center gap-4">
+            <AiFillDashboard className="w-5 h-5" />
+            Dashboard
+          </div>
+        </MenuItem>
+        <SubMenu
+          label="Quản lý sản phẩm"
+          icon={<FaBook className="w-5 h-5" />}
+        >
+          <MenuItem component={<Link to="/admin/manage-product" />}>
+            Danh sách sản phẩm
+          </MenuItem>
+          <MenuItem component={<Link to="/admin/manage-author" />}>
+            Tác giả
+          </MenuItem>
+          <MenuItem component={<Link to="/admin/manage-publishes" />}>
+            Nhà xuất bản
+          </MenuItem>
+        </SubMenu>
+        <MenuItem component={<Link to="/admin/manage-category" />}>
+          <div className="flex items-center gap-4">
+          <AiOutlineBars className="w-5 h-5" />
+            Quản lý danh mục
+          </div>
+        </MenuItem>
+        
+        <MenuItem component={<Link to="/admin/manage-order" />}>
+          <div className="flex items-center gap-4">
+            <FaClipboardList className="w-5 h-5" />
+            Quản lý đơn hàng
+          </div>
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/manage-user" />}>
+          <div className="flex items-center gap-4">
+            <FaUser />
+            Quản lý tài khoản
+          </div>
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/manage-voucher" />}>
+          <div className="flex items-center gap-4">
+            <FaGift />
+            Quản lý voucher
+          </div>
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/manage-blog" />}>
+          <div className="flex items-center gap-4">
+          <FaRegEdit className="w-5 h-5" />
+            Quản lý bài viết
+          </div>
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/manage-contact" />}>
+          <div className="flex items-center gap-4">
+            <MdMarkEmailRead />
+            Quản lý liên hệ
+          </div>
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/stock" />}>
+          <div className="flex items-center gap-4">
+            <MdInventory />
+            Quản lý tồn kho
+          </div>
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/manage-comment" />}>
+          <div className="flex items-center gap-4">
+            <FaCommentAlt />
+            Quản lý bình luận
+          </div>
+        </MenuItem>
+        <MenuItem component={<Link to="/admin/manage-review" />}>
+          <div className="flex items-center gap-4">
+            <MdOutlinePreview />
+            Quản lý đánh giá
+          </div>
+        </MenuItem>
+        <MenuItem onClick={handleLogout}>
+          <div className="flex items-center gap-4">
+            <MdLogout />
+            Đăng xuất
+          </div>
+        </MenuItem>
+      </Menu>
         </Sidebar>
         {/* Nút toggle nằm bên ngoài Sidebar */}
-        <button onClick={() => setCollapsed(!collapsed)} className="toggle-button">
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="toggle-button"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
-            stroke="currentColor">
+            stroke="currentColor"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -173,7 +227,10 @@ const EditBlog = () => {
             <PageTitle title="Cập nhật bài viết" className="text-mainDark" />
           </div>
           <div className="border rounded-[10px] py-8 px-5 mt-7">
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="flex flex-col gap-6"
+            >
               <div className="w-full flex flex-col gap-2">
                 <label htmlFor="name">*Tên bài viết</label>
                 <input
@@ -182,7 +239,9 @@ const EditBlog = () => {
                   id="name"
                   className="input input-bordered w-full"
                 />
-                {errors.name && <p className="text-red-500">Tên bài viết là bắt buộc</p>}
+                {errors.name && (
+                  <p className="text-red">Tên bài viết là bắt buộc</p>
+                )}
               </div>
               <div className="w-full flex flex-col gap-2">
                 <label htmlFor="date">*Ngày viết</label>
@@ -192,7 +251,9 @@ const EditBlog = () => {
                   id="date"
                   className="input input-bordered w-full"
                 />
-                {errors.date && <p className="text-red-500">Ngày viết là bắt buộc</p>}
+                {errors.date && (
+                  <p className="text-red">Ngày viết là bắt buộc</p>
+                )}
               </div>
               <div className="w-full flex flex-col gap-2">
                 <label htmlFor="image">*Hình ảnh</label>
@@ -210,7 +271,9 @@ const EditBlog = () => {
                   className="file-input file-input-bordered w-full"
                   onChange={handleImageChange}
                 />
-                {errors.image && <p className="text-red-500">Hình ảnh là bắt buộc</p>}
+                {errors.image && (
+                  <p className="text-red">Hình ảnh là bắt buộc</p>
+                )}
               </div>
               <div className="w-full flex flex-col gap-2">
                 <label htmlFor="content">Nội dung</label>
@@ -219,11 +282,15 @@ const EditBlog = () => {
                   id="content"
                   className="input input-bordered w-full h-32"
                 />
-                {errors.content && <p className="text-red-500">Nội dung là bắt buộc</p>}
+                {errors.content && (
+                  <p className="text-red">Nội dung là bắt buộc</p>
+                )}
               </div>
               <div className="flex items-center gap-3">
                 <Button>Lưu</Button>
-                <Button className="bg-secondary">Hủy</Button>
+                <Button className="bg-secondary" onClick={handleCancel}>
+                  Hủy
+                </Button>
               </div>
             </form>
           </div>

@@ -63,33 +63,39 @@ const Footer = () => {
               <div className="mt-3 text-grayText mb-5 font-normal leading-normal text-[15px]">
                 Bạn có câu hỏi? Liên hệ chúng tôi
               </div>
-              <div className="mb-5 font-semibold leading-normal">(+84) 776 831 909</div>
+              <div className="mb-5 font-semibold leading-normal">
+                (+84) 776 831 909
+              </div>
               <ul className="flex items-center gap-4">
                 <li>
                   <a
                     href="#"
-                    className="flex items-center justify-center text-white w-10 h-10 rounded-full bg-mainDark max-md:w-8 max-md:h-8">
+                    className="flex items-center justify-center text-white w-10 h-10 rounded-full bg-mainDark max-md:w-8 max-md:h-8"
+                  >
                     <FaFacebook className="w-5 h-5 max-sm:w-4 max-sm:h-4" />
                   </a>
                 </li>
                 <li>
                   <a
                     href="#"
-                    className="flex items-center justify-center text-white w-10 h-10 rounded-full bg-mainDark max-md:w-8 max-md:h-8">
+                    className="flex items-center justify-center text-white w-10 h-10 rounded-full bg-mainDark max-md:w-8 max-md:h-8"
+                  >
                     <FaInstagram className="w-5 h-5 max-sm:w-4 max-sm:h-4" />
                   </a>
                 </li>
                 <li>
                   <a
                     href="#"
-                    className="flex items-center justify-center text-white w-10 h-10 rounded-full bg-mainDark max-md:w-8 max-md:h-8">
+                    className="flex items-center justify-center text-white w-10 h-10 rounded-full bg-mainDark max-md:w-8 max-md:h-8"
+                  >
                     <FaTwitter className="w-5 h-5 max-sm:w-4 max-sm:h-4" />
                   </a>
                 </li>
                 <li>
                   <a
                     href="#"
-                    className="flex items-center justify-center text-white w-10 h-10 rounded-full bg-mainDark max-md:w-8 max-md:h-8">
+                    className="flex items-center justify-center text-white w-10 h-10 rounded-full bg-mainDark max-md:w-8 max-md:h-8"
+                  >
                     <FaYoutube className="w-5 h-5 max-sm:w-4 max-sm:h-4" />
                   </a>
                 </li>
@@ -103,7 +109,9 @@ const Footer = () => {
                 <li>
                   <a href="#" className="flex gap-2 font-normal">
                     <HiOutlineLocationMarker className="w-6 h-6 max-md:w-5 max-md:h-5" />
-                    <div className="leading-normal">Quận 12, Thành phố Hồ Chí Minh</div>
+                    <div className="leading-normal">
+                      Quận 12, Thành phố Hồ Chí Minh
+                    </div>
                   </a>
                 </li>
                 <li>
@@ -117,7 +125,7 @@ const Footer = () => {
                 <li>
                   <a href="#" className="flex items-center gap-2 font-normal">
                     <CgMail className="w-6 h-6 max-md:w-5 max-md:h-5" />
-                    <div>bansach@gmail.com</div>
+                    <div>hongltmps28690@fpt.edu.vn</div>
                   </a>
                 </li>
               </ul>
@@ -145,7 +153,7 @@ const Footer = () => {
         <div className="flex justify-between items-center pt-5 font-medium leading-normal max-md:flex-col">
           <div>Copyright © . All rights reserved.</div>
           <div className="flex items-center gap-2 max-md:hidden">
-            <img src="./images/card.png" alt="" />
+            {/* <img src="./images/card.png" alt="" /> */}
           </div>
         </div>
       </div>

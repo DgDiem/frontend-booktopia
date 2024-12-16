@@ -10,6 +10,7 @@ import axios from "axios";
 import { URL_API } from "../../constants/constants";
 import { formatDate } from "../../helpers/helpers";
 import Loading from "../../components/Loading/Loading";
+import { Link } from "react-router-dom";
 
 const Blog = () => {
   const sliderRef = useRef(null);
@@ -33,7 +34,8 @@ const Blog = () => {
         right: "-65px",
         transform: "translateY(-50%)",
       }}
-      onClick={onClick}>
+      onClick={onClick}
+    >
       <FaAngleRight style={{ color: "black", fontSize: "20px" }} />
     </div>
   );
@@ -56,7 +58,8 @@ const Blog = () => {
         left: "-65px",
         transform: "translateY(-50%)",
       }}
-      onClick={onClick}>
+      onClick={onClick}
+    >
       <FaAngleLeft style={{ color: "black", fontSize: "20px" }} />
     </div>
   );
@@ -129,11 +132,13 @@ const Blog = () => {
               <Slider ref={sliderRef} {...settings}>
                 {getBlog.map((item) => (
                   <div key={item._id}>
-                    <img
-                      src={`${URL_API}/images/${item.image}`}
-                      alt="Blog-img"
-                      className="w-full h-auto rounded-lg"
-                    />
+                    <Link to={`/blog-detail/${item._id}`}>
+                      <img
+                        src={`${URL_API}/images/${item.image}`}
+                        alt="Blog-img"
+                        className="w-full h-auto rounded-lg"
+                      />
+                    </Link>
                     <div className="flex flex-col mt-3">
                       <div className="text-gray-500 font-normal leading-normal">
                         {formatDate(item.date)}
@@ -154,7 +159,9 @@ const Blog = () => {
             </div>
           </div>
           <div className="max-w-[350px] w-full max-lg:hidden max-xl:hidden max-md:hidden">
-            <h3 className="text-lg text-text font-semibold leading-normal">Bài viết mới</h3>
+            <h3 className="text-lg text-text font-semibold leading-normal">
+              Bài viết mới
+            </h3>
             <BlogNewList />
           </div>
         </div>

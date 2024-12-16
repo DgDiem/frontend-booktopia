@@ -1,57 +1,62 @@
+/* eslint-disable no-undef */
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
+import Cookies from "js-cookie";
 import {
   FaBook,
   FaClipboardList,
-  FaGift,
-  FaMoneyBill,
   FaRegEdit,
-  FaShoppingBag,
-  FaTrashAlt,
   FaUser,
-  FaUserEdit,
-  FaUsers,
-  FaPlus,
+  FaImage,
+  FaGift,
   FaCommentAlt,
 } from "react-icons/fa";
-import { MdInventory, MdOutlinePreview } from "react-icons/md";
-import { MdLogout } from "react-icons/md";
+import { MdLogout, MdOutlinePreview } from "react-icons/md";
 import { AiFillDashboard, AiOutlineBars } from "react-icons/ai";
-import { format } from "date-fns";
-import HeaderAdmin from "../../../components/HeaderAdmin/HeaderAdmin";
-import PageTitle from "../../../components/PageTitle/PageTitle";
-
-import axios from "axios";
-import { URL_API } from "../../../constants/constants";
-import Cookies from "js-cookie";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  Rectangle,
-} from "recharts";
-import { PieChart, Pie } from "recharts";
 import { MdMarkEmailRead } from "react-icons/md";
-import ReactPaginate from 'react-paginate'; // Import thư viện react-paginate
+import { MdInventory } from "react-icons/md";
+import axios from "axios";
+import Swal from "sweetalert2";
 
-const Stock = () => {
-  const isAdmin = true;
+import PageTitle from "../../../components/PageTitle/PageTitle";
+import HeaderAdmin from "../../../components/HeaderAdmin/HeaderAdmin";
+import { URL_API } from "../../../constants/constants";
+import Button from "../../../components/Button/Button";
+
+const DetailComment = () => {
   const navigate = useNavigate();
+  const [comment, setComment] = useState(null);
   const [collapsed, setCollapsed] = useState(false);
-  const [user, setUser] = useState({});
-  // Lấy dữ liệu người dùng từ cookie
+  const { id } = useParams();
+
+  // Fetch the comment details when the component mounts
   useEffect(() => {
-    const userData = Cookies.get("user");
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
-      setUser(parsedUser.user);
-    }
-  }, []);
+    const fetchCommentDetails = async () => {
+      try {
+        const response = await axios.get(`${URL_API}/comment/${id}`);
+        setComment(response.data);
+      } catch (error) {
+        console.error("Error fetching comment details", error);
+        Swal.fire("Error", "Lỗi.", "error");
+      }
+    };
+
+    fetchCommentDetails();
+  }, [id]);
+
+  if (!comment) {
+    return <div>Loading...</div>;
+  }
+
+  // Lấy dữ liệu người dùng từ cookie
+  // useEffect(() => {
+  //   const userData = Cookies.get("user");
+  //   if (userData) {
+  //     const parsedUser = JSON.parse(userData);
+  //     setUser(parsedUser.user);
+  //   }
+  // }, []);
 
   // Đăng xuất xóa cookie người dùng
   const handleLogout = () => {
@@ -62,38 +67,6 @@ const Stock = () => {
     navigate("/sign-in");
     window.location.reload();
   };
-  const [allProductList, setAllProductList] = useState([]);
-  const [currentItems, setCurrentItems] = useState([]); // Danh sách sản phẩm hiển thị trên trang hiện tại
-  const [pageCount, setPageCount] = useState(0); // Tổng số trang
-  const [itemOffset, setItemOffset] = useState(0); // Vị trí bắt đầu của danh sách sản phẩm trên trang hiện tại
-  const itemsPerPage = 10; // Số lượng sản phẩm trên mỗi trang
-
-  useEffect(() => {
-    const fetchProductList = async () => {
-      try {
-        const response = await axios.get(`${URL_API}/products`);
-        const data = response.data;
-        setAllProductList(data);
-        console.log(data);
-
-        // Phân trang sau khi lấy dữ liệu sản phẩm
-        const endOffset = itemOffset + itemsPerPage;
-        setCurrentItems(data.slice(itemOffset, endOffset));
-        setPageCount(Math.ceil(data.length / itemsPerPage));
-      } catch (error) {
-        console.log(error);
-        setAllProductList([]); // Đặt mảng rỗng trong trường hợp lỗi
-      }
-    };
-    fetchProductList();
-  }, [itemOffset, itemsPerPage]);
-
-  // Xử lý khi chuyển trang
-  const handlePageClick = (event) => {
-    const newOffset = (event.selected * itemsPerPage) % allProductList.length;
-    setItemOffset(newOffset);
-  };
-
   return (
     <div>
       <div className="flex min-h-screen border">
@@ -210,94 +183,108 @@ const Stock = () => {
             />
           </svg>
         </button>
+        {/* Main Content */}
         <div className="flex-1 p-6">
           <HeaderAdmin />
-          <div className="flex items-center justify-between pb-5 border-b">
-            <PageTitle title="Danh sách tồn kho" className="text-mainDark" />
+          <div className="flex items-center justify-between pb-8 border-b pt-3">
+            <PageTitle title={`Chi tiết bình luận`} className="text-mainDark" />
           </div>
           <div className="mt-6 border rounded-[30px] p-5">
+            <form action="" className="flex flex-col gap-6">
+              <div className="flex items-center justify-between gap-12">
+                <div className="w-full flex flex-col gap-2">
+                  <label htmlFor="">*Mã đơn hàng</label>
+                  <input
+                    type="text"
+                    value={comment.commentId}
+                    className="input input-bordered w-full"
+                    readOnly
+                  />
+                </div>
+                <div className="w-full flex flex-col gap-2">
+                  <label htmlFor="">*Tên khách hàng</label>
+                  <input
+                    type="text"
+                    value={comment.customerName}
+                    className="input input-bordered w-full"
+                    readOnly
+                  />
+                </div>
+                <div className="w-full flex flex-col gap-2">
+                  <label htmlFor="">Ngày lập</label>
+                  <input
+                    type="date"
+                    value={comment.createdAt}
+                    className="input input-bordered w-full"
+                    readOnly
+                  />
+                </div>
+              </div>
+
+              <div className="w-full flex flex-col gap-2">
+                <label htmlFor="">*Nội dung</label>
+                <input
+                  type="text"
+                  value={comment.content}
+                  className="input input-bordered w-full"
+                  readOnly
+                />
+              </div>
+            </form>
+
+            <h1
+              className="text-mainDark"
+              style={{
+                margin: "20px 8px",
+                fontSize: "20px",
+                fontWeight: "bold",
+              }}
+            >
+              Sản phẩm
+            </h1>
             <table className="table w-full">
               <thead className="text-[16px] font-semibold text-black">
                 <tr>
                   <th>#</th>
-                  <th>Hình ảnh</th>
+                  <th className="text-center flex items-center justify-center max-w-[150px]">
+                    <FaImage className="w-6 h-6 " />
+                  </th>
                   <th>Tên sách</th>
-                  <th>Tác giả</th>
-                  <th>Danh mục</th>
-                  <th>Nhà xuất bản</th>
-                  <th className="text-center">Giá</th>
-                  <th>Số lượng</th>
+                  <th>Giá</th>
                 </tr>
               </thead>
               <tbody>
-                {currentItems.map((item, index) => ( // Sử dụng currentItems để hiển thị
-                  <tr key={item._id}>
-                    <td>{(itemOffset + index) + 1}</td> {/* Hiển thị số thứ tự chính xác */}
-                    <td>
+                {/*comment.productDetails.map((product, index) => (
+                  <tr key={index}>
+                    <td>{index + 1}</td>
+                    <td className="flex items-center justify-center max-w-[150px]">
                       <img
-                        src={`${URL_API}/images/${item.image1}`}
-                        className="w-20 h-20"
-                        alt={item.name}
+                        src={`${URL_API}/images/${product.image}`}
+                        className="w-full"
+                        alt={product.name}
                       />
                     </td>
-                    <td>{item.name}</td>
-                    <td>{item.author?.authorName || "Chưa có"}</td>
-                    <td>{item.category?.categoryName || "Chưa có"}</td>
-                    <td>{item.publish?.publishName || "Chưa có"}</td>
                     <td>
-                      <div className="flex items-center justify-center gap-4">
-                        <div>
-                          {item.price1.toLocaleString("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                          })}
+                      <div className="flex flex-col gap-3">
+                        <div style={{ fontSize: "16px" }}>
+                          <b>{product.name}</b>
                         </div>
-                        <div className="text-red">
-                          {item.price2?.toLocaleString("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                          }) || "chưa có"}
+                        <div>{`Tác giả: ${product.author}`}</div>
+                        <div>{`Thể loại: ${product.category}`}</div>
+                      </div>
+                    </td>
+                    <td>
+                      <div style={{ display: "flex" }}>
+                        <del>{product.originalPrice}đ</del>
+                        <div style={{ fontSize: "16px", marginLeft: "10px" }}>
+                          {product.price}đ
                         </div>
                       </div>
                     </td>
-                    {item.quantity === 0 ? (
-                      <td className="text-red px-3 text-center">Hết hàng</td>
-                    ) : (
-                      <td className="px-3 text-center">{item.quantity}</td>
-                    )}
                   </tr>
-                ))}
+                )) */}
               </tbody>
             </table>
-            {/* Phân trang */}
-            <ReactPaginate
-            breakLabel={
-              <span className="px-3 py-2 leading-tight text-gray-500">
-                ...
-              </span>
-            } // Thêm style cho breakLabel
-            nextLabel={"Sau"}
-            onPageChange={handlePageClick}
-            marginPagesDisplayed={1}
-            pageRangeDisplayed={3}
-            pageCount={pageCount}
-            previousLabel={"Trước"}
-            renderOnZeroPageCount={null}
-            containerClassName={"flex justify-center items-center"} // Thêm class Tailwind CSS
-            pageClassName={
-              "px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700"
-            } // Thêm class cho từng nút trang
-            previousLinkClassName={
-              "px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 rounded-l-lg"
-            } // Thêm class cho nút "Trước"
-            nextLinkClassName={
-              "px-3 py-2 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 rounded-r-lg"
-            }// Thêm class cho nút "Sau"
-            activeClassName={
-              "px-3 py-2 text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700"
-            } // Thêm class cho nút trang hiện tại
-            disabledClassName={"opacity-50 cursor-not-allowed"} // Thêm class cho nút bị vô hiệu hóa
-          />
           </div>
         </div>
       </div>
@@ -305,4 +292,4 @@ const Stock = () => {
   );
 };
 
-export default Stock;
+export default DetailComment;

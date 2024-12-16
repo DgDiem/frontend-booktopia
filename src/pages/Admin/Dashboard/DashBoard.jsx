@@ -4,6 +4,7 @@ import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import {
   FaBook,
   FaClipboardList,
+  FaCommentAlt,
   FaGift,
   FaMoneyBill,
   FaRegEdit,
@@ -13,7 +14,7 @@ import {
   FaUserEdit,
   FaUsers,
 } from "react-icons/fa";
-import { MdLogout } from "react-icons/md";
+import { MdLogout, MdOutlinePreview } from "react-icons/md";
 import { AiFillDashboard, AiOutlineBars } from "react-icons/ai";
 import "./DashBoard.css";
 import { format } from "date-fns";
@@ -23,7 +24,16 @@ import { MdInventory } from "react-icons/md";
 import axios from "axios";
 import { URL_API } from "../../../constants/constants";
 import Cookies from "js-cookie";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Rectangle } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  Rectangle,
+} from "recharts";
 import { PieChart, Pie } from "recharts";
 import { MdMarkEmailRead } from "react-icons/md";
 
@@ -48,7 +58,6 @@ const DashBoard = () => {
         const response = await axios.get(`${URL_API}/products/hot`);
         const data = response.data;
         setProductHot(data);
-        console.log(data);
       } catch (error) {
         console.log(error);
         setProductHot([]);
@@ -62,7 +71,6 @@ const DashBoard = () => {
         const response = await axios.get(`${URL_API}/products/view`);
         const data = response.data;
         setProductView(data);
-        console.log(data);
       } catch (error) {
         console.log(error);
         setProductView([]);
@@ -78,6 +86,14 @@ const DashBoard = () => {
       console.log(error);
     }
   };
+  // Lấy dữ liệu người dùng từ cookie
+  useEffect(() => {
+    const userData = Cookies.get("user");
+    if (userData) {
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser.user);
+    }
+  }, []);
   // Lấy dữ liệu người dùng từ cookie
   useEffect(() => {
     const userData = Cookies.get("user");
@@ -106,8 +122,12 @@ const DashBoard = () => {
         ]);
         setTotalUser(getTotalUser.data.length);
         setTotalOrder(getTotalOrder.data.length);
+        
         const totalValue = getTotalOrder.data.reduce((acc, order) => {
-          return acc + (parseFloat(order.total) || 0);
+          if (order.status === "Giao thành công") {
+            return acc + (parseFloat(order.total) || 0);
+          }
+          return acc;
         }, 0);
         setTotalRevenue(totalValue);
       } catch (error) {
@@ -213,8 +233,11 @@ const DashBoard = () => {
       <div className="flex min-h-screen border">
         {/* Sidebar */}
         <Sidebar
-          className={`relative border p-3 bg-white ${collapsed ? "collapsed" : "expanded"}`}
-          width={collapsed ? "0px" : "270px"}>
+          className={`relative border p-3 bg-white ${
+            collapsed ? "collapsed" : "expanded"
+          }`}
+          width={collapsed ? "0px" : "270px"}
+        >
           <Menu className="bg-white">
             <div className="flex items-center justify-center mb-6">
               <img src="./images/logo.png" alt="Logo" />
@@ -225,19 +248,27 @@ const DashBoard = () => {
                 Dashboard
               </div>
             </MenuItem>
-
-            <SubMenu label="Quản lý danh mục" icon={<AiOutlineBars className="w-5 h-5" />}>
-              <MenuItem component={<Link to="/admin/manage-category" />}>
-                Danh sách danh mục
-              </MenuItem>
-            </SubMenu>
-            <SubMenu label="Quản lý sản phẩm" icon={<FaBook className="w-5 h-5" />}>
+            <SubMenu
+              label="Quản lý sản phẩm"
+              icon={<FaBook className="w-5 h-5" />}
+            >
               <MenuItem component={<Link to="/admin/manage-product" />}>
                 Danh sách sản phẩm
               </MenuItem>
-              <MenuItem component={<Link to="/admin/manage-author" />}>Tác giả</MenuItem>
-              <MenuItem component={<Link to="/admin/manage-publishes" />}>Nhà xuất bản</MenuItem>
+              <MenuItem component={<Link to="/admin/manage-author" />}>
+                Tác giả
+              </MenuItem>
+              <MenuItem component={<Link to="/admin/manage-publishes" />}>
+                Nhà xuất bản
+              </MenuItem>
             </SubMenu>
+            <MenuItem component={<Link to="/admin/manage-category" />}>
+              <div className="flex items-center gap-4">
+              <AiOutlineBars className="w-5 h-5" />
+                Quản lý danh mục
+              </div>
+            </MenuItem>
+            
             <MenuItem component={<Link to="/admin/manage-order" />}>
               <div className="flex items-center gap-4">
                 <FaClipboardList className="w-5 h-5" />
@@ -256,9 +287,12 @@ const DashBoard = () => {
                 Quản lý voucher
               </div>
             </MenuItem>
-            <SubMenu label="Quản lý bài viết" icon={<FaRegEdit className="w-5 h-5" />}>
-              <MenuItem component={<Link to="/admin/manage-blog" />}>Danh sách bài viết</MenuItem>
-            </SubMenu>
+            <MenuItem component={<Link to="/admin/manage-blog" />}>
+              <div className="flex items-center gap-4">
+              <FaRegEdit className="w-5 h-5" />
+                Quản lý bài viết
+              </div>
+            </MenuItem>
             <MenuItem component={<Link to="/admin/manage-contact" />}>
               <div className="flex items-center gap-4">
                 <MdMarkEmailRead />
@@ -267,8 +301,20 @@ const DashBoard = () => {
             </MenuItem>
             <MenuItem component={<Link to="/admin/stock" />}>
               <div className="flex items-center gap-4">
-              <MdInventory />
+                <MdInventory />
                 Quản lý tồn kho
+              </div>
+            </MenuItem>
+            <MenuItem component={<Link to="/admin/manage-comment" />}>
+              <div className="flex items-center gap-4">
+                <FaCommentAlt />
+                Quản lý bình luận
+              </div>
+            </MenuItem>
+            <MenuItem component={<Link to="/admin/manage-review" />}>
+              <div className="flex items-center gap-4">
+                <MdOutlinePreview />
+                Quản lý đánh giá
               </div>
             </MenuItem>
             <MenuItem onClick={handleLogout}>
@@ -280,13 +326,17 @@ const DashBoard = () => {
           </Menu>
         </Sidebar>
         {/* Nút toggle nằm bên ngoài Sidebar */}
-        <button onClick={() => setCollapsed(!collapsed)} className="toggle-button">
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="toggle-button"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
-            stroke="currentColor">
+            stroke="currentColor"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -442,7 +492,11 @@ const DashBoard = () => {
                 {filteredOrders.map((order, index) => (
                   <tr key={order._id}>
                     <td>{index + 1}</td>
-                    <td><Link to={`/admin/detail-order/${order._id}`}>{order.orderId}</Link></td>
+                    <td>
+                      <Link to={`/admin/detail-order/${order._id}`}>
+                        {order.orderId}
+                      </Link>
+                    </td>
                     <td>{format(new Date(order.date), "dd/MM/yyyy")}</td>
                     <td>{order.name}</td>
                     <td>{order.address}</td>

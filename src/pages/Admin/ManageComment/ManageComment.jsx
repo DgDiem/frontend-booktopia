@@ -1,49 +1,30 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
-import { MdInventory } from "react-icons/md";
 import {
   FaBook,
   FaClipboardList,
   FaRegEdit,
-  FaTrashAlt,
   FaUser,
-  FaCommentAlt,
-  FaUserClock,
+  FaEye,
   FaGift,
+  FaCommentAlt,
 } from "react-icons/fa";
-import { MdOutlinePreview } from "react-icons/md";
-import { MdLogout } from "react-icons/md";
+import { MdLogout, MdOutlinePreview } from "react-icons/md";
 import { AiFillDashboard, AiOutlineBars } from "react-icons/ai";
 import PageTitle from "../../../components/PageTitle/PageTitle";
 import HeaderAdmin from "../../../components/HeaderAdmin/HeaderAdmin";
-import Cookies from "js-cookie";
 import axios from "axios";
+import { MdInventory } from "react-icons/md";
 import { URL_API } from "../../../constants/constants";
+import { showSwalFireDelete } from "../../../helpers/helpers";
 import { MdMarkEmailRead } from "react-icons/md";
-
-const PurchaseHistory = () => {
+import Cookies from "js-cookie";
+const ManageComment = () => {
   const isAdmin = true;
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
-  const [orders, setOrders] = useState([]);
   const [user, setUser] = useState({});
-  const { id } = useParams();
-
-  const fetchOrders = async (userId) => {
-    try {
-      const response = await axios.get(`${URL_API}/orders/user/${userId}`);
-      setOrders(response.data);
-    } catch (error) {
-      console.error("Lỗi khi gọi API:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (id) {
-      fetchOrders(id);
-    }
-  }, [id]);
   // Lấy dữ liệu người dùng từ cookie
   useEffect(() => {
     const userData = Cookies.get("user");
@@ -61,6 +42,28 @@ const PurchaseHistory = () => {
     // Chuyển hướng hoặc cập nhật state để hiển thị UI phù hợp
     navigate("/sign-in");
     window.location.reload();
+  };
+  const [listComment, setListComment] = useState([]);
+  useEffect(() => {
+    const fetchDataComment = async () => {
+      try {
+        const response = await axios.get(`${URL_API}/comment`);
+        const data = response.data;
+        setListComment(data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchDataComment();
+  }, []);
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`${URL_API}/users/${id}`);
+      showSwalFireDelete("Xóa người dùng thành công");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -169,85 +172,57 @@ const PurchaseHistory = () => {
         <div className="flex-1 p-6">
           <HeaderAdmin />
           <div className="flex items-center justify-between pb-8 border-b pt-3">
-            <PageTitle title="Lịch sử mua hàng" className="text-mainDark" />
+            <PageTitle title="Quản lý bình luận" className="text-mainDark" />
           </div>
-          {orders.length > 0 ? (
-            orders.map((order) => (
-              <div key={order._id} className="mt-6 border rounded-lg p-5">
-                <div className="flex items-center justify-between pb-3 border-b border-b-gray-300">
-                  <div>
-                    <span>Mã đơn hàng: </span>
-                    <span>{order.orderId}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="pr-3">
-                      Ngày đặt: {new Date(order.date).toLocaleDateString()}
-                    </span>
-                    <span className="text-mainDark border-l border-l-gray-300 pl-3 font-medium">
-                      {order.status}
-                    </span>
-                  </div>
-                </div>
-                {order.listProducts.map((product, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between py-3 border-b border-b-gray-300">
-                    <div className="flex items-center">
-                      <div className="max-w-[110px]">
-                        <img
-                          className="w-full"
-                          src={`${URL_API}/images/${product.image1}`}
-                          alt={product.name}
-                        />
-                      </div>
-                      <div className="flex flex-col gap-3">
-                        <h3 className="font-normal">{product.name}</h3>
-                        <div className="text-sm text-gray-400">{product.author.authorName}</div>
-                        <span className="text-sm">x{product.quantity}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="text-sm text-gray-400 line-through">
-                        {product
-                          ? Number(product.price1).toLocaleString("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            })
-                          : ""}
-                      </div>
-                      <div className="text-lg text-red font-semibold">
-                        {product
-                          ? Number(product.price2).toLocaleString("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            })
-                          : ""}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                <div className="flex justify-end mt-4">
-                  <div className="flex items-center">
-                    <span>Thành tiền: </span>
-                    <div className="text-xl text-red font-semibold ml-3">
-                      {order
-                        ? Number(order.total).toLocaleString("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                          })
-                        : ""}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="text-center text-gray-500 mt-6">Chưa có lịch sử mua hàng</div>
-          )}
+          <div className="mt-6 border rounded-[30px] p-5">
+            <table className="table w-full">
+              <thead className="text-[16px] font-semibold text-black">
+                <tr>
+                  <th>#</th>
+                  <th>Tên người dùng</th>
+                  <th>Nội dung</th>
+                  <th>Ngày</th>
+                  <th className="text-center">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                {listComment && listComment.length > 0 ? (
+                  listComment.map((item, index) => {
+                    const dateObj = new Date(item.day); // Chắc bạn muốn lấy ngày từ `item.date` chứ không phải `order.date`
+                    const formattedDate = dateObj.toLocaleDateString("vi-VN"); // 'vi-VN' for dd/mm/yyyy format
+                    return (
+                      <tr key={item._id}>
+                        <td>{index + 1}</td>
+                        <td>{item?.user?.name}</td>
+                        <td>{item.content}</td>
+                        <td>{formattedDate}</td> {/* Sửa phần hiển thị ngày */}
+                        <td>
+                          <div className="flex items-center justify-center gap-3">
+                            <button>
+                              <Link to={`/admin/detail-comment/${item._id}`}>
+                                <FaEye className="w-5 h-4 text-mainDark" />
+                              </Link>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="text-center">
+                      Không có bình luận nào.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+          {/* Content goes here */}
         </div>
       </div>
     </div>
   );
 };
 
-export default PurchaseHistory;
+export default ManageComment;
