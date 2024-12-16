@@ -1,7 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
+
 const initialState = {
   items: [],
 };
+
 const cartSlice = createSlice({
   name: "cart", // Tên của slice là "cart"
   initialState,
@@ -27,13 +29,26 @@ const cartSlice = createSlice({
         item.quantity = Math.max(item.quantity + quantity, 1); // Đảm bảo số lượng không âm
       }
     },
+    updateCartItemQuantityDirectly: (state, action) => {
+      const { id, newQuantity } = action.payload;
+      const item = state.items.find((item) => item._id === id);
+      if (item) {
+        // Kiểm tra số lượng nhập vào hợp lệ và không vượt quá số lượng tồn kho
+        item.quantity = Math.max(newQuantity, 1); // Đảm bảo số lượng không âm và lớn hơn 0
+      }
+    },
     clearCart: (state) => {
       state.items = [];
     },
   },
 });
 
-export const { addToCart, removeFromCart, updateCartItemQuantity, clearCart } = cartSlice.actions;
+export const {
+  addToCart,
+  removeFromCart,
+  updateCartItemQuantity,
+  updateCartItemQuantityDirectly,
+  clearCart,
+} = cartSlice.actions;
 
-// export const selectCartItems = (state) => state.cart.items;
 export default cartSlice.reducer;

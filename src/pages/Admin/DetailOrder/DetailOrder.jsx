@@ -183,12 +183,7 @@ const DetailOrder = () => {
                 Quản lý bình luận
               </div>
             </MenuItem>
-            <MenuItem component={<Link to="/admin/manage-review" />}>
-              <div className="flex items-center gap-4">
-                <MdOutlinePreview />
-                Quản lý đánh giá
-              </div>
-            </MenuItem>
+
             <MenuItem onClick={handleLogout}>
               <div className="flex items-center gap-4">
                 <MdLogout />
@@ -252,6 +247,16 @@ const DetailOrder = () => {
                 </div>
               </div>
 
+              <div className="w-full flex flex-col gap-2">
+                <label htmlFor="">*Số điện thoại</label>
+                <input
+                  type="text"
+                  placeholder="09xxxxxxxx"
+                  value={order.phone || ""}
+                  className="input input-bordered w-full"
+                  readOnly
+                />
+              </div>
               <div className="w-full flex flex-col gap-2">
                 <label htmlFor="">*Địa chỉ</label>
                 <input

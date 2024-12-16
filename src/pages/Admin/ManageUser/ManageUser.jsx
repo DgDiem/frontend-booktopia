@@ -176,12 +176,7 @@ const ManageUser = () => {
                 Quản lý bình luận
               </div>
             </MenuItem>
-            <MenuItem component={<Link to="/admin/manage-review" />}>
-              <div className="flex items-center gap-4">
-                <MdOutlinePreview />
-                Quản lý đánh giá
-              </div>
-            </MenuItem>
+
             <MenuItem onClick={handleLogout}>
               <div className="flex items-center gap-4">
                 <MdLogout />

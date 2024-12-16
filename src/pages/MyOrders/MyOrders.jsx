@@ -17,7 +17,7 @@ const MyOrders = () => {
     setSelectedStatus(id);
   };
   const filteredOrders = orders.filter((order) => {
-    if (selectedStatus === 1) return true; // Hiển thị tất cả đơn hàng nếu "Tất cả đơn hàng" được chọn
+    if (selectedStatus === 1) return true;
     if (selectedStatus === 2) return order.status === "Chờ xác nhận";
     if (selectedStatus === 3) return order.status === "Đang xử lý";
     if (selectedStatus === 4) return order.status === "Đang vận chuyển";
@@ -71,12 +71,12 @@ const MyOrders = () => {
   };
   const handleDelete = async (id) => {
     try {
-      const response = await axios.delete(`${URL_API}/orders/${id}`);
+      const response = await axios.put(`${URL_API}/orders/${id}/cancel`);
 
       if (response.status === 200) {
         Swal.fire({
-          title: "Bạn có muốn xóa?",
-          text: "Đã xóa không thể khôi phục",
+          title: "Bạn muốn hủy đơn?",
+          text: "Đã hủy không thể khôi phục",
           icon: "warning",
           showCancelButton: true,
           confirmButtonColor: "#3085d6",

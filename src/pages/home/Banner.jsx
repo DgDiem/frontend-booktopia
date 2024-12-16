@@ -9,9 +9,9 @@ const Banner = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const sliderRef = useRef(null);
   const listBanner = [
-    { id: 1, image: "./images/banner1.jpg" },
-    { id: 2, image: "./images/banner2.jpg" },
-    { id: 3, image: "./images/banner3.jpg" },
+    { id: 1, image: "./images/banner1.png" },
+    { id: 2, image: "./images/banner2.png" },
+    { id: 3, image: "./images/banner3.png" },
   ];
 
   const SampleNextArrow = ({ onClick }) => (
@@ -26,7 +26,8 @@ const Banner = () => {
         transform: "translateY(-50%)",
         zIndex: "1",
       }}
-      onClick={onClick}>
+      onClick={onClick}
+    >
       <FaAngleRight style={{ fontSize: "20px" }} />
     </div>
   );
@@ -43,7 +44,8 @@ const Banner = () => {
         transform: "translateY(-50%)",
         zIndex: "1",
       }}
-      onClick={onClick}>
+      onClick={onClick}
+    >
       <FaAngleLeft style={{ fontSize: "20px" }} />
     </div>
   );
@@ -99,7 +101,8 @@ const Banner = () => {
         className="w-3 h-3 rounded-full cursor-pointer"
         style={{
           backgroundColor: i === currentSlide ? "#166534" : "#ccc",
-        }}></div>
+        }}
+      ></div>
     ),
     beforeChange: (current, next) => setCurrentSlide(next),
   };

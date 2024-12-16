@@ -26,6 +26,7 @@ import { showSwalFireDelete } from "../../../helpers/helpers";
 import ReactPaginate from "react-paginate"; // Import thư viện React Paginate
 import Cookies from "js-cookie";
 import Swal from "sweetalert2";
+import "./ManageProduct.css";
 const ManageProduct = () => {
   const location = useLocation();
   const isAdmin = true;
@@ -67,7 +68,7 @@ const ManageProduct = () => {
       try {
         const url = searchTerm.trim()
           ? `${URL_API}/products/search/${searchTerm.trim()}`
-          : `${URL_API}/products`;
+          : `${URL_API}/products/admin`;
         const response = await axios.get(url);
         setProducts(response.data);
 
@@ -118,9 +119,7 @@ const ManageProduct = () => {
       Swal.fire({
         icon: "success",
         title: "Cập nhật trạng thái thành công!",
-        text: `Sản phẩm đã được ${
-          updatedStatus ? "kích hoạt" : "ẩn"
-        } thành công.`,
+        text: `Sản phẩm đã được ${updatedStatus ? "kích hoạt" : "ẩn"} thành công.`,
       });
     } catch (error) {
       console.error("Lỗi khi cập nhật trạng thái sản phẩm", error);
@@ -133,114 +132,95 @@ const ManageProduct = () => {
   };
 
   return (
-    <div>
-      <div className="flex min-h-screen border">
+    <div className="">
+      <div className="flex min-h-screen">
         {/* Sidebar */}
         <Sidebar
-          className={`relative border p-3 bg-white ${
-            collapsed ? "collapsed" : "expanded"
-          }`}
-          width={collapsed ? "0px" : "270px"}
-        >
-        <Menu className="bg-white">
-        <div className="flex items-center justify-center mb-6">
-          <img src="./images/logo.png" alt="Logo" />
-        </div>
-        <MenuItem component={<Link to="/admin/dashboard" />}>
-          <div className="flex items-center gap-4">
-            <AiFillDashboard className="w-5 h-5" />
-            Dashboard
-          </div>
-        </MenuItem>
-        <SubMenu
-          label="Quản lý sản phẩm"
-          icon={<FaBook className="w-5 h-5" />}
-        >
-          <MenuItem component={<Link to="/admin/manage-product" />}>
-            Danh sách sản phẩm
-          </MenuItem>
-          <MenuItem component={<Link to="/admin/manage-author" />}>
-            Tác giả
-          </MenuItem>
-          <MenuItem component={<Link to="/admin/manage-publishes" />}>
-            Nhà xuất bản
-          </MenuItem>
-        </SubMenu>
-        <MenuItem component={<Link to="/admin/manage-category" />}>
-          <div className="flex items-center gap-4">
-          <AiOutlineBars className="w-5 h-5" />
-            Quản lý danh mục
-          </div>
-        </MenuItem>
-        
-        <MenuItem component={<Link to="/admin/manage-order" />}>
-          <div className="flex items-center gap-4">
-            <FaClipboardList className="w-5 h-5" />
-            Quản lý đơn hàng
-          </div>
-        </MenuItem>
-        <MenuItem component={<Link to="/admin/manage-user" />}>
-          <div className="flex items-center gap-4">
-            <FaUser />
-            Quản lý tài khoản
-          </div>
-        </MenuItem>
-        <MenuItem component={<Link to="/admin/manage-voucher" />}>
-          <div className="flex items-center gap-4">
-            <FaGift />
-            Quản lý voucher
-          </div>
-        </MenuItem>
-        <MenuItem component={<Link to="/admin/manage-blog" />}>
-          <div className="flex items-center gap-4">
-          <FaRegEdit className="w-5 h-5" />
-            Quản lý bài viết
-          </div>
-        </MenuItem>
-        <MenuItem component={<Link to="/admin/manage-contact" />}>
-          <div className="flex items-center gap-4">
-            <MdMarkEmailRead />
-            Quản lý liên hệ
-          </div>
-        </MenuItem>
-        <MenuItem component={<Link to="/admin/stock" />}>
-          <div className="flex items-center gap-4">
-            <MdInventory />
-            Quản lý tồn kho
-          </div>
-        </MenuItem>
-        <MenuItem component={<Link to="/admin/manage-comment" />}>
-          <div className="flex items-center gap-4">
-            <FaCommentAlt />
-            Quản lý bình luận
-          </div>
-        </MenuItem>
-        <MenuItem component={<Link to="/admin/manage-review" />}>
-          <div className="flex items-center gap-4">
-            <MdOutlinePreview />
-            Quản lý đánh giá
-          </div>
-        </MenuItem>
-        <MenuItem onClick={handleLogout}>
-          <div className="flex items-center gap-4">
-            <MdLogout />
-            Đăng xuất
-          </div>
-        </MenuItem>
-      </Menu>
+          className={`relative border p-3 bg-white ${collapsed ? "collapsed" : "expanded"}`}
+          width={collapsed ? "0px" : "270px"}>
+          <Menu className="bg-white">
+            <div className="flex items-center justify-center mb-6">
+              <img src="./images/logo.png" alt="Logo" />
+            </div>
+            <MenuItem component={<Link to="/admin/dashboard" />}>
+              <div className="flex items-center gap-4">
+                <AiFillDashboard className="w-5 h-5" />
+                Dashboard
+              </div>
+            </MenuItem>
+            <SubMenu label="Quản lý sản phẩm" icon={<FaBook className="w-5 h-5" />}>
+              <MenuItem component={<Link to="/admin/manage-product" />}>
+                Danh sách sản phẩm
+              </MenuItem>
+              <MenuItem component={<Link to="/admin/manage-author" />}>Tác giả</MenuItem>
+              <MenuItem component={<Link to="/admin/manage-publishes" />}>Nhà xuất bản</MenuItem>
+            </SubMenu>
+            <MenuItem component={<Link to="/admin/manage-category" />}>
+              <div className="flex items-center gap-4">
+                <AiOutlineBars className="w-5 h-5" />
+                Quản lý danh mục
+              </div>
+            </MenuItem>
+
+            <MenuItem component={<Link to="/admin/manage-order" />}>
+              <div className="flex items-center gap-4">
+                <FaClipboardList className="w-5 h-5" />
+                Quản lý đơn hàng
+              </div>
+            </MenuItem>
+            <MenuItem component={<Link to="/admin/manage-user" />}>
+              <div className="flex items-center gap-4">
+                <FaUser />
+                Quản lý tài khoản
+              </div>
+            </MenuItem>
+            <MenuItem component={<Link to="/admin/manage-voucher" />}>
+              <div className="flex items-center gap-4">
+                <FaGift />
+                Quản lý voucher
+              </div>
+            </MenuItem>
+            <MenuItem component={<Link to="/admin/manage-blog" />}>
+              <div className="flex items-center gap-4">
+                <FaRegEdit className="w-5 h-5" />
+                Quản lý bài viết
+              </div>
+            </MenuItem>
+            <MenuItem component={<Link to="/admin/manage-contact" />}>
+              <div className="flex items-center gap-4">
+                <MdMarkEmailRead />
+                Quản lý liên hệ
+              </div>
+            </MenuItem>
+            <MenuItem component={<Link to="/admin/stock" />}>
+              <div className="flex items-center gap-4">
+                <MdInventory />
+                Quản lý tồn kho
+              </div>
+            </MenuItem>
+            <MenuItem component={<Link to="/admin/manage-comment" />}>
+              <div className="flex items-center gap-4">
+                <FaCommentAlt />
+                Quản lý bình luận
+              </div>
+            </MenuItem>
+
+            <MenuItem onClick={handleLogout}>
+              <div className="flex items-center gap-4">
+                <MdLogout />
+                Đăng xuất
+              </div>
+            </MenuItem>
+          </Menu>
         </Sidebar>
         {/* Nút toggle nằm bên ngoài Sidebar */}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="toggle-button"
-        >
+        <button onClick={() => setCollapsed(!collapsed)} className="toggle-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
-            stroke="currentColor"
-          >
+            stroke="currentColor">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -249,7 +229,7 @@ const ManageProduct = () => {
           </svg>
         </button>
         {/* Main Content */}
-        <div className="flex-1 p-6">
+        <div className="flex-1">
           <HeaderAdmin />
           <div className="flex items-center justify-between pb-5 border-b">
             <PageTitle title="Danh sách sản phẩm" className="text-mainDark" />
@@ -261,8 +241,8 @@ const ManageProduct = () => {
               </Link>
             </div>
           </div>
-          <div className="mt-6 border rounded-[30px] p-5">
-            <table className="table w-full">
+          <div className="mt-6 border rounded-[30px] p-2">
+            <table className="table w-full table-product">
               <thead className="text-[16px] font-semibold text-black">
                 <tr>
                   <th>#</th>
@@ -313,16 +293,11 @@ const ManageProduct = () => {
                       <div className="flex items-center justify-center gap-3">
                         <button
                           type="button"
-                          onClick={() =>
-                            handleUpdateStatus(item._id, item.isActive)
-                          }
+                          onClick={() => handleUpdateStatus(item._id, item.isActive)}
                           className="w-28 text-[12px] justify-items-center p-2 rounded-lg text-white cursor-pointer flex items-center justify-center gap-2"
                           style={{
-                            backgroundColor: item.isActive
-                              ? "#166534"
-                              : "#ef4444",
-                          }}
-                        >
+                            backgroundColor: item.isActive ? "#166534" : "#ef4444",
+                          }}>
                           {item.isActive ? "Đang hoạt động" : "Ngưng hoạt động"}
                         </button>
                       </div>
@@ -337,7 +312,6 @@ const ManageProduct = () => {
                         </button> */}
                       </div>
                     </td>
-                    
                   </tr>
                 ))}
               </tbody>
@@ -346,11 +320,7 @@ const ManageProduct = () => {
             <ReactPaginate
               previousLabel={"Trước"}
               nextLabel={"Sau"}
-              breakLabel={
-                <span className="px-3 py-2 leading-tight text-gray-500">
-                  ...
-                </span>
-              } // Thêm style cho breakLabel
+              breakLabel={<span className="px-3 py-2 leading-tight text-gray-500">...</span>} // Thêm style cho breakLabel
               pageCount={pageCount}
               marginPagesDisplayed={1} //xác định số lượng nút số trang hiển thị ở đầu và cuối danh sách phân trang
               pageRangeDisplayed={3} //xác định số lượng nút số trang hiển thị xung quanh trang hiện tại.

@@ -30,7 +30,6 @@ const Checkout = () => {
     [listProducts]
   );
   const address = getValues("address");
-
   const [data, setData] = useState([]);
   const [cities, setCities] = useState([]);
   const [selectedCity, setSelectedCity] = useState("");
@@ -216,15 +215,21 @@ const Checkout = () => {
         title: "Áp dụng voucher thành công",
       });
     } catch (error) {
-      console.error("Error applying voucher:", error);
+      let errorMessage = "Đã xảy ra lỗi khi áp dụng voucher.";
+      if (error.response && error.response.data && error.response.data.mess) {
+        errorMessage = error.response.data.mess.message;
+      }
+
       Swal.fire({
         icon: "error",
         title: "Không thành công",
-        text: error.message,
+        text: errorMessage,
       });
-      return 0; // Nếu có lỗi, trả về 0
+
+      return 0;
     }
   };
+
   const handleApplyVoucher = async () => {
     const discount = await applyVoucher(voucherCode);
     if (discount > 0) {
@@ -328,6 +333,9 @@ const Checkout = () => {
                     Chọn Thành Phố:
                   </label>
                   <select
+                    {...register("city", {
+                      required: "Vui lòng chọn thành phố",
+                    })}
                     value={selectedCity}
                     onChange={handleCityChange}
                     className="input input-bordered w-full">
@@ -338,12 +346,16 @@ const Checkout = () => {
                       </option>
                     ))}
                   </select>
+                  {errors.city && <p className="errform text-red">{errors.city.message}</p>}
                 </div>
 
                 {selectedCity && (
                   <div>
                     <label className="block mb-2">Chọn Quận Huyện:</label>
                     <select
+                      {...register("district", {
+                        required: "Vui lòng chọn quận/huyện",
+                      })}
                       value={selectedDistrict}
                       onChange={handleDistrictChange}
                       className="input input-bordered w-full">
@@ -354,6 +366,9 @@ const Checkout = () => {
                         </option>
                       ))}
                     </select>
+                    {errors.district && (
+                      <p className="errform text-red">{errors.district.message}</p>
+                    )}
                   </div>
                 )}
 
@@ -361,6 +376,9 @@ const Checkout = () => {
                   <div>
                     <label className="block mb-2">Chọn Phường Xã:</label>
                     <select
+                      {...register("ward", {
+                        required: "Vui lòng chọn phường/xã",
+                      })}
                       value={selectedWard}
                       onChange={(e) => setSelectedWard(e.target.value)}
                       className="input input-bordered w-full">
@@ -371,6 +389,7 @@ const Checkout = () => {
                         </option>
                       ))}
                     </select>
+                    {errors.ward && <p className="errform text-red">{errors.ward.message}</p>}
                   </div>
                 )}
               </div>
@@ -384,10 +403,14 @@ const Checkout = () => {
                   <div className="flex items-center gap-3">
                     <label htmlFor="giaohang" className="checkbox-style">
                       <input
+                        // {...register("shippingMethod", {
+                        //   required: "Vui lòng chọn phương thức vận chuyển",
+                        // })}
                         type="checkbox"
                         name="giaohang"
                         id="giaohang"
                         className="checkbox-input"
+                        defaultChecked
                       />
                       <div className="checkbox-box"></div>
                     </label>
@@ -395,6 +418,9 @@ const Checkout = () => {
                   </div>
                   <div className="ml-10">30.000đ</div>
                 </div>
+                {errors.shippingMethod && (
+                  <p className="errform text-red">{errors.shippingMethod.message}</p>
+                )}
               </div>
 
               {/* Phương thức thanh toán */}
@@ -517,13 +543,13 @@ const Checkout = () => {
                   </div>
                   <div className="flex justify-between text-text font-normal leading-normal">
                     <span>Phí vận chuyển:</span>
-                    <span>{shippingFee}đ</span>
+                    <span>{shippingFee.toLocaleString("vi-VN")}đ</span>
                   </div>
                 </div>
                 {discount > 0 && (
                   <div className="flex items-center justify-between gap-3 mt-3">
                     <p className="text-text font-normal leading-normal">Giảm giá:</p>
-                    <p className="font-semibold">{discount}đ</p>
+                    <p className="font-semibold">{discount.toLocaleString("vi-VN")}đ</p>
                   </div>
                 )}
                 <div className="flex justify-between text-text font-normal leading-normal mt-10">

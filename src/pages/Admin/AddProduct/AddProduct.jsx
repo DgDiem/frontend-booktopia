@@ -21,6 +21,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import HeaderAdmin from "../../../components/HeaderAdmin/HeaderAdmin";
 import Cookies from "js-cookie";
+import { URL_API } from "../../../constants/constants";
 const AddProduct = () => {
   const [selectedImages, setSelectedImages] = useState({});
   const [listCategory, setListCategory] = useState([]);
@@ -30,7 +31,7 @@ const AddProduct = () => {
   useEffect(() => {
     const fetchListCategory = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/category");
+        const response = await axios.get(`${URL_API}/category`);
         setListCategory(response.data);
       } catch (error) {
         console.log(error);
@@ -39,7 +40,7 @@ const AddProduct = () => {
 
     const fetchListAuthor = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/authors");
+        const response = await axios.get(`${URL_API}/authors`);
         setListAuthor(response.data);
       } catch (error) {
         console.log(error);
@@ -48,7 +49,7 @@ const AddProduct = () => {
 
     const fetchListPublishes = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/publishes");
+        const response = await axios.get(`${URL_API}/publishes`);
         setListPublishes(response.data);
         console.log("List of publishes:", response.data);
       } catch (error) {
@@ -120,15 +121,11 @@ const AddProduct = () => {
         }
       });
 
-      const response = await axios.post(
-        "http://localhost:3000/products",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await axios.post(`${URL_API}/products`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       Swal.fire({
         position: "top-end",
@@ -163,92 +160,87 @@ const AddProduct = () => {
         }`}
         width={collapsed ? "0px" : "270px"}
       >
-      <Menu className="bg-white">
-      <div className="flex items-center justify-center mb-6">
-        <img src="./images/logo.png" alt="Logo" />
-      </div>
-      <MenuItem component={<Link to="/admin/dashboard" />}>
-        <div className="flex items-center gap-4">
-          <AiFillDashboard className="w-5 h-5" />
-          Dashboard
-        </div>
-      </MenuItem>
-      <SubMenu
-        label="Quản lý sản phẩm"
-        icon={<FaBook className="w-5 h-5" />}
-      >
-        <MenuItem component={<Link to="/admin/manage-product" />}>
-          Danh sách sản phẩm
-        </MenuItem>
-        <MenuItem component={<Link to="/admin/manage-author" />}>
-          Tác giả
-        </MenuItem>
-        <MenuItem component={<Link to="/admin/manage-publishes" />}>
-          Nhà xuất bản
-        </MenuItem>
-      </SubMenu>
-      <MenuItem component={<Link to="/admin/manage-category" />}>
-        <div className="flex items-center gap-4">
-        <AiOutlineBars className="w-5 h-5" />
-          Quản lý danh mục
-        </div>
-      </MenuItem>
-      
-      <MenuItem component={<Link to="/admin/manage-order" />}>
-        <div className="flex items-center gap-4">
-          <FaClipboardList className="w-5 h-5" />
-          Quản lý đơn hàng
-        </div>
-      </MenuItem>
-      <MenuItem component={<Link to="/admin/manage-user" />}>
-        <div className="flex items-center gap-4">
-          <FaUser />
-          Quản lý tài khoản
-        </div>
-      </MenuItem>
-      <MenuItem component={<Link to="/admin/manage-voucher" />}>
-        <div className="flex items-center gap-4">
-          <FaGift />
-          Quản lý voucher
-        </div>
-      </MenuItem>
-      <MenuItem component={<Link to="/admin/manage-blog" />}>
-        <div className="flex items-center gap-4">
-        <FaRegEdit className="w-5 h-5" />
-          Quản lý bài viết
-        </div>
-      </MenuItem>
-      <MenuItem component={<Link to="/admin/manage-contact" />}>
-        <div className="flex items-center gap-4">
-          <MdMarkEmailRead />
-          Quản lý liên hệ
-        </div>
-      </MenuItem>
-      <MenuItem component={<Link to="/admin/stock" />}>
-        <div className="flex items-center gap-4">
-          <MdInventory />
-          Quản lý tồn kho
-        </div>
-      </MenuItem>
-      <MenuItem component={<Link to="/admin/manage-comment" />}>
-        <div className="flex items-center gap-4">
-          <FaCommentAlt />
-          Quản lý bình luận
-        </div>
-      </MenuItem>
-      <MenuItem component={<Link to="/admin/manage-review" />}>
-        <div className="flex items-center gap-4">
-          <MdOutlinePreview />
-          Quản lý đánh giá
-        </div>
-      </MenuItem>
-      <MenuItem onClick={handleLogout}>
-        <div className="flex items-center gap-4">
-          <MdLogout />
-          Đăng xuất
-        </div>
-      </MenuItem>
-    </Menu>
+        <Menu className="bg-white">
+          <div className="flex items-center justify-center mb-6">
+            <img src="./images/logo.png" alt="Logo" />
+          </div>
+          <MenuItem component={<Link to="/admin/dashboard" />}>
+            <div className="flex items-center gap-4">
+              <AiFillDashboard className="w-5 h-5" />
+              Dashboard
+            </div>
+          </MenuItem>
+          <SubMenu
+            label="Quản lý sản phẩm"
+            icon={<FaBook className="w-5 h-5" />}
+          >
+            <MenuItem component={<Link to="/admin/manage-product" />}>
+              Danh sách sản phẩm
+            </MenuItem>
+            <MenuItem component={<Link to="/admin/manage-author" />}>
+              Tác giả
+            </MenuItem>
+            <MenuItem component={<Link to="/admin/manage-publishes" />}>
+              Nhà xuất bản
+            </MenuItem>
+          </SubMenu>
+          <MenuItem component={<Link to="/admin/manage-category" />}>
+            <div className="flex items-center gap-4">
+              <AiOutlineBars className="w-5 h-5" />
+              Quản lý danh mục
+            </div>
+          </MenuItem>
+
+          <MenuItem component={<Link to="/admin/manage-order" />}>
+            <div className="flex items-center gap-4">
+              <FaClipboardList className="w-5 h-5" />
+              Quản lý đơn hàng
+            </div>
+          </MenuItem>
+          <MenuItem component={<Link to="/admin/manage-user" />}>
+            <div className="flex items-center gap-4">
+              <FaUser />
+              Quản lý tài khoản
+            </div>
+          </MenuItem>
+          <MenuItem component={<Link to="/admin/manage-voucher" />}>
+            <div className="flex items-center gap-4">
+              <FaGift />
+              Quản lý voucher
+            </div>
+          </MenuItem>
+          <MenuItem component={<Link to="/admin/manage-blog" />}>
+            <div className="flex items-center gap-4">
+              <FaRegEdit className="w-5 h-5" />
+              Quản lý bài viết
+            </div>
+          </MenuItem>
+          <MenuItem component={<Link to="/admin/manage-contact" />}>
+            <div className="flex items-center gap-4">
+              <MdMarkEmailRead />
+              Quản lý liên hệ
+            </div>
+          </MenuItem>
+          <MenuItem component={<Link to="/admin/stock" />}>
+            <div className="flex items-center gap-4">
+              <MdInventory />
+              Quản lý tồn kho
+            </div>
+          </MenuItem>
+          <MenuItem component={<Link to="/admin/manage-comment" />}>
+            <div className="flex items-center gap-4">
+              <FaCommentAlt />
+              Quản lý bình luận
+            </div>
+          </MenuItem>
+
+          <MenuItem onClick={handleLogout}>
+            <div className="flex items-center gap-4">
+              <MdLogout />
+              Đăng xuất
+            </div>
+          </MenuItem>
+        </Menu>
       </Sidebar>
       {/* Nút toggle nằm bên ngoài Sidebar */}
       <button

@@ -4,7 +4,12 @@ import { FaMinus, FaPlus, FaRegTrashAlt } from "react-icons/fa";
 import Button from "../../components/Button/Button";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { updateCartItemQuantity, removeFromCart, clearCart } from "../../redux/slices/cartslide"; // Đảm bảo đường dẫn đúng
+import {
+  updateCartItemQuantityDirectly,
+  updateCartItemQuantity,
+  removeFromCart,
+  clearCart,
+} from "../../redux/slices/cartslide"; // Đảm bảo đường dẫn đúng
 import { URL_API } from "../../constants/constants";
 
 const Cart = () => {
@@ -89,6 +94,63 @@ const Cart = () => {
         });
       }
     });
+  };
+
+  const handleQuantityChange = async (id, newQuantity) => {
+    try {
+      // Kiểm tra số lượng mới phải lớn hơn 0
+      if (newQuantity <= 0) {
+        Swal.fire({
+          title: "Số lượng không hợp lệ!",
+          text: "Số lượng phải lớn hơn 0.",
+          icon: "warning",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
+
+      // Lấy sản phẩm từ API để kiểm tra số lượng tồn kho
+      const response = await fetch(`${URL_API}/products/${id}`);
+      if (!response.ok) {
+        throw new Error("Không thể lấy thông tin sản phẩm");
+      }
+      const product = await response.json();
+
+      // Tìm sản phẩm trong giỏ hàng
+      const itemInCart = cartItems.find((item) => item._id === id);
+
+      if (!itemInCart) {
+        // Nếu sản phẩm không có trong giỏ hàng
+        Swal.fire({
+          title: "Lỗi!",
+          text: "Sản phẩm không có trong giỏ hàng.",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
+
+      // Kiểm tra xem số lượng yêu cầu có vượt quá số lượng tồn kho không
+      if (newQuantity > product.quantity) {
+        Swal.fire({
+          title: "Không thể tăng số lượng!",
+          text: `Chỉ còn ${product.quantity} sản phẩm trong kho!`,
+          icon: "warning",
+          confirmButtonText: "OK",
+        });
+      } else {
+        // Cập nhật số lượng sản phẩm trong giỏ hàng
+        dispatch(updateCartItemQuantityDirectly({ id, newQuantity }));
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy thông tin sản phẩm:", error);
+      Swal.fire({
+        title: "Lỗi!",
+        text: "Đã có lỗi xảy ra. Vui lòng thử lại.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+    }
   };
 
   const hasItems = cartItems.length > 0;
@@ -198,7 +260,23 @@ const Cart = () => {
                                 type="text"
                                 className="w-8 text-center border-0 focus:ring-0"
                                 value={item.quantity}
-                                readOnly
+                                onChange={(e) => {
+                                  const value = e.target.value;
+                                  // Nếu nhập trống, không làm gì, không thay đổi số lượng
+                                  if (value === "") {
+                                    handleQuantityChange(item._id, 0); // Giảm số lượng về 0 (hoặc có thể xử lý theo cách khác nếu cần)
+                                    return;
+                                  }
+                                  // Nếu giá trị nhập vào là một số hợp lệ và >= 1, cập nhật số lượng
+                                  const newQuantity = parseInt(value);
+                                  if (!isNaN(newQuantity) && newQuantity >= 1) {
+                                    handleQuantityChange(item._id, newQuantity);
+                                  } else {
+                                    // Nếu không phải số hợp lệ, giữ lại số lượng hiện tại
+                                    e.target.value = item.quantity;
+                                  }
+                                }}
+                                min="1" // Giới hạn số lượng tối thiểu là 1
                               />
                               <button
                                 className="px-3 py-2 text-gray-600 hover:text-gray-800 focus:outline-none"
@@ -288,9 +366,25 @@ const Cart = () => {
                   })}
                 </span>
               </div>
-              <Button className="w-full rounded-[5px] mt-5">
-                <Link to="/checkout">Thanh toán</Link>
-              </Button>
+              {hasItems ? (
+                <Button className="w-full rounded-[5px] mt-5">
+                  <Link to="/checkout">Thanh toán</Link>
+                </Button>
+              ) : (
+                <button
+                  disabled
+                  style={{
+                    padding: "15px 25px",
+                    borderRadius: "4px",
+                    color: "white",
+                    backgroundColor: "#6B7280",
+                    cursor: "not-allowed",
+                  }}
+                  className="w-full rounded-[5px] mt-5 bg-blue-500 text-white 
+             disabled:bg-gray-400 disabled:cursor-not-allowed disabled:opacity-50">
+                  <span className="pointer-events-none">Thanh Toán</span>
+                </button>
+              )}
               {/* <div className="text-center my-5">Hỗ trợ thanh toán với</div>
               <div className="flex items-center justify-center gap-5">
                 <img src="./images/visa.png" alt="Visa" />

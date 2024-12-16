@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
@@ -27,10 +26,10 @@ import Button from "../../../components/Button/Button";
 const DetailComment = () => {
   const navigate = useNavigate();
   const [comment, setComment] = useState(null);
+  const [user, setUser] = useState({});
   const [collapsed, setCollapsed] = useState(false);
   const { id } = useParams();
 
-  // Fetch the comment details when the component mounts
   useEffect(() => {
     const fetchCommentDetails = async () => {
       try {
@@ -49,7 +48,10 @@ const DetailComment = () => {
     return <div>Loading...</div>;
   }
 
-  // Lấy dữ liệu người dùng từ cookie
+  const dateObj = new Date(comment.createdAt);
+  const formattedDate = dateObj.toISOString().split("T")[0];
+
+  // // Lấy dữ liệu người dùng từ cookie
   // useEffect(() => {
   //   const userData = Cookies.get("user");
   //   if (userData) {
@@ -72,11 +74,8 @@ const DetailComment = () => {
       <div className="flex min-h-screen border">
         {/* Sidebar */}
         <Sidebar
-          className={`relative border p-3 bg-white ${
-            collapsed ? "collapsed" : "expanded"
-          }`}
-          width={collapsed ? "0px" : "270px"}
-        >
+          className={`relative border p-3 bg-white ${collapsed ? "collapsed" : "expanded"}`}
+          width={collapsed ? "0px" : "270px"}>
           <Menu className="bg-white">
             <div className="flex items-center justify-center mb-6">
               <img src="./images/logo.png" alt="Logo" />
@@ -87,19 +86,12 @@ const DetailComment = () => {
                 Dashboard
               </div>
             </MenuItem>
-            <SubMenu
-              label="Quản lý sản phẩm"
-              icon={<FaBook className="w-5 h-5" />}
-            >
+            <SubMenu label="Quản lý sản phẩm" icon={<FaBook className="w-5 h-5" />}>
               <MenuItem component={<Link to="/admin/manage-product" />}>
                 Danh sách sản phẩm
               </MenuItem>
-              <MenuItem component={<Link to="/admin/manage-author" />}>
-                Tác giả
-              </MenuItem>
-              <MenuItem component={<Link to="/admin/manage-publishes" />}>
-                Nhà xuất bản
-              </MenuItem>
+              <MenuItem component={<Link to="/admin/manage-author" />}>Tác giả</MenuItem>
+              <MenuItem component={<Link to="/admin/manage-publishes" />}>Nhà xuất bản</MenuItem>
             </SubMenu>
             <MenuItem component={<Link to="/admin/manage-category" />}>
               <div className="flex items-center gap-4">
@@ -150,12 +142,7 @@ const DetailComment = () => {
                 Quản lý bình luận
               </div>
             </MenuItem>
-            <MenuItem component={<Link to="/admin/manage-review" />}>
-              <div className="flex items-center gap-4">
-                <MdOutlinePreview />
-                Quản lý đánh giá
-              </div>
-            </MenuItem>
+
             <MenuItem onClick={handleLogout}>
               <div className="flex items-center gap-4">
                 <MdLogout />
@@ -165,17 +152,13 @@ const DetailComment = () => {
           </Menu>
         </Sidebar>
         {/* Nút toggle nằm bên ngoài Sidebar */}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="toggle-button"
-        >
+        <button onClick={() => setCollapsed(!collapsed)} className="toggle-button">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
-            stroke="currentColor"
-          >
+            stroke="currentColor">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -193,7 +176,8 @@ const DetailComment = () => {
             <form action="" className="flex flex-col gap-6">
               <div className="flex items-center justify-between gap-12">
                 <div className="w-full flex flex-col gap-2">
-                  <label htmlFor="">*Mã đơn hàng</label>
+                  <label htmlFor="">*Mã sản phẩm</label>
+
                   <input
                     type="text"
                     value={comment.commentId}
@@ -214,7 +198,7 @@ const DetailComment = () => {
                   <label htmlFor="">Ngày lập</label>
                   <input
                     type="date"
-                    value={comment.createdAt}
+                    value={formattedDate}
                     className="input input-bordered w-full"
                     readOnly
                   />
@@ -238,14 +222,12 @@ const DetailComment = () => {
                 margin: "20px 8px",
                 fontSize: "20px",
                 fontWeight: "bold",
-              }}
-            >
+              }}>
               Sản phẩm
             </h1>
             <table className="table w-full">
               <thead className="text-[16px] font-semibold text-black">
                 <tr>
-                  <th>#</th>
                   <th className="text-center flex items-center justify-center max-w-[150px]">
                     <FaImage className="w-6 h-6 " />
                   </th>
@@ -254,35 +236,36 @@ const DetailComment = () => {
                 </tr>
               </thead>
               <tbody>
-                {/*comment.productDetails.map((product, index) => (
-                  <tr key={index}>
-                    <td>{index + 1}</td>
+                {comment.productDetails && (
+                  <tr>
                     <td className="flex items-center justify-center max-w-[150px]">
                       <img
-                        src={`${URL_API}/images/${product.image}`}
+                        src={`${URL_API}/images/${comment.productDetails.image1}`}
                         className="w-full"
-                        alt={product.name}
+                        alt={comment.productDetails.name}
                       />
                     </td>
                     <td>
                       <div className="flex flex-col gap-3">
                         <div style={{ fontSize: "16px" }}>
-                          <b>{product.name}</b>
+                          <b>{comment.productDetails.name}</b>
                         </div>
-                        <div>{`Tác giả: ${product.author}`}</div>
-                        <div>{`Thể loại: ${product.category}`}</div>
+                        <div>{`Tác giả: ${comment.productDetails.author.authorName}`}</div>
+                        <div>{`Thể loại: ${comment.productDetails.category.categoryName}`}</div>
                       </div>
                     </td>
                     <td>
                       <div style={{ display: "flex" }}>
-                        <del>{product.originalPrice}đ</del>
                         <div style={{ fontSize: "16px", marginLeft: "10px" }}>
-                          {product.price}đ
+                          {comment.productDetails.price2.toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          })}
                         </div>
                       </div>
                     </td>
                   </tr>
-                )) */}
+                )}
               </tbody>
             </table>
           </div>

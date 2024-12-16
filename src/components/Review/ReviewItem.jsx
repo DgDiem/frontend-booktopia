@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { AiOutlineDelete } from "react-icons/ai";
+import { URL_API } from "../../constants/constants";
 
 // Hàm để tạo sao dựa trên rating
 const renderStars = (rating) => {
@@ -11,7 +12,7 @@ const renderStars = (rating) => {
   return stars.join(""); // Trả về chuỗi các sao
 };
 
-const ReviewItem = ({ dataReview, handleDeleteReview}) => {
+const ReviewItem = ({ dataReview, handleDeleteReview }) => {
   const [inforUser, setInforUser] = useState(null);
 
   useEffect(() => {
@@ -25,14 +26,17 @@ const ReviewItem = ({ dataReview, handleDeleteReview}) => {
   }, []);
 
   console.log("dataReview:", dataReview);
-  
+
   return (
     <div className="mt-10">
       <div className="">
         {/* Kiểm tra nếu dataReview là mảng và có phần tử */}
         {Array.isArray(dataReview) && dataReview.length > 0 ? (
           dataReview.map((review) => (
-            <div key={review._id} className="flex items-center mb-2 justify-between">
+            <div
+              key={review._id}
+              className="flex items-center mb-2 justify-between"
+            >
               <div className="w-[100%]">
                 <div className="border flex justify-between rounded-[10px] py-4 px-5 w-full">
                   <div className="flex flex-col gap-2">
@@ -41,7 +45,7 @@ const ReviewItem = ({ dataReview, handleDeleteReview}) => {
                         <img
                           src={
                             review?.user?.image
-                              ? `http://localhost:3000/images/${review?.user.image}`
+                              ? `${URL_API}/images/${review?.user.image}`
                               : "./images/avatar.png"
                           }
                           className="w-10 h-10 rounded-full"
@@ -68,11 +72,15 @@ const ReviewItem = ({ dataReview, handleDeleteReview}) => {
                         </div>
                       </div>
                     </div>
-                    <p className="text-text font-normal leading-normal">{review?.content}</p>
+                    <p className="text-text font-normal leading-normal">
+                      {review?.content}
+                    </p>
                   </div>
                   {review?.user?._id === inforUser?._id && (
                     <div className="cursor-pointer font-medium">
-                      <AiOutlineDelete onClick={() => handleDeleteReview(review?._id)} />
+                      <AiOutlineDelete
+                        onClick={() => handleDeleteReview(review?._id)}
+                      />
                     </div>
                   )}
                 </div>
@@ -83,7 +91,6 @@ const ReviewItem = ({ dataReview, handleDeleteReview}) => {
           <h1>Không có đánh giá</h1> // Hiển thị khi không có đánh giá
         )}
       </div>
-    
     </div>
   );
 };

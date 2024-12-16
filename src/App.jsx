@@ -44,9 +44,14 @@ import ManageContact from "./pages/Admin/ManageContact/ManageContact";
 import Notification from "./pages/Admin/Notification/Notification";
 import Stock from "./pages/Admin/Stock/Stock";
 import ManageComment from "./pages/Admin/ManageComment/ManageComment";
-import ManageReview from "./pages/Admin/ManageReview/ManageReview";
 import DetailComment from "./pages/Admin/DetailComment/DetailComment";
 import DetailReview from "./pages/Admin/DetailReview/DetailReview";
+import TermsOfUse from "./pages/Admin/TermsOfUse/TermsOfUse";
+import PrivacyPolicy from "./pages/PrivacyPolicy/PrivacyPolicy";
+import PaymentPolicy from "./pages/PaymentPolicy/PaymentPolicy";
+import WarrantyPolicy from "./pages/WarrantyPolicy/WarrantyPolicy";
+import ReturnPolicy from "./pages/ReturnPolicy/ReturnPolicy";
+import ShippingPolicy from "./pages/ShippingPolicy/ShippingPolicy";
 function App() {
   return (
     // <Fragment>
@@ -147,7 +152,8 @@ function App() {
               <PrivateRoute allowedRoles={[0]}>
                 <Blog />
               </PrivateRoute>
-            }></Route>
+            }
+          ></Route>
           <Route
             path="/blog-detail/:id"
             element={
@@ -208,8 +214,56 @@ function App() {
           <Route
             path="/favorites"
             element={
-              <PrivateRoute allowedRoles={[-1]}>
+              <PrivateRoute allowedRoles={[0]}>
                 <Favorite />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/term-of-use"
+            element={
+              <PrivateRoute allowedRoles={[0]}>
+                <TermsOfUse />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/privacy-policy"
+            element={
+              <PrivateRoute allowedRoles={[0]}>
+                <PrivacyPolicy />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/payment-policy"
+            element={
+              <PrivateRoute allowedRoles={[0]}>
+                <PaymentPolicy />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/warranty-policy"
+            element={
+              <PrivateRoute allowedRoles={[0]}>
+                <WarrantyPolicy />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/return-policy"
+            element={
+              <PrivateRoute allowedRoles={[0]}>
+                <ReturnPolicy />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/shipping-policy"
+            element={
+              <PrivateRoute allowedRoles={[0]}>
+                <ShippingPolicy />
               </PrivateRoute>
             }
           />
@@ -222,6 +276,7 @@ function App() {
             }
           />
         </Route>
+
         {/* admin */}
 
         <Route
@@ -230,7 +285,8 @@ function App() {
             <PrivateRoute allowedRoles={[1]}>
               <DashBoard />
             </PrivateRoute>
-          }></Route>
+          }
+        ></Route>
         <Route
           path="/admin/manage-product"
           element={
@@ -437,14 +493,6 @@ function App() {
           element={
             <PrivateRoute allowedRoles={[1]}>
               <ManageComment />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/admin/manage-review"
-          element={
-            <PrivateRoute allowedRoles={[1]}>
-              <ManageReview />
             </PrivateRoute>
           }
         />
